@@ -21,19 +21,21 @@ fn dispatch(args: &[String]) -> i32 {
             print_help();
             0
         }
-        [cmd, rest @ ..] if cmd == "init" => match home_from_args(rest) {
-            Ok(home) => match logline_lab_core::init_lab_home(&home) {
-                Ok(report) => {
-                    println!("{}", report.to_text());
-                    0
+        [cmd, rest @ ..] if cmd == "init" => match init_args(rest) {
+            Ok((home, pack_id, profile_id)) => {
+                match logline_lab_core::init_lab_home_with_selection(&home, &pack_id, &profile_id) {
+                    Ok(report) => {
+                        println!("{}", report.to_text());
+                        0
+                    }
+                    Err(err) => {
+                        eprintln!("init: failed");
+                        eprintln!("home: {}", home.display());
+                        eprintln!("error: {err}");
+                        1
+                    }
                 }
-                Err(err) => {
-                    eprintln!("init: failed");
-                    eprintln!("home: {}", home.display());
-                    eprintln!("error: {err}");
-                    1
-                }
-            },
+            }
             Err(message) => {
                 eprintln!("{message}");
                 1
@@ -235,6 +237,41 @@ fn dispatch_report(args: &[String]) -> i32 {
     }
 }
 
+fn init_args(args: &[String]) -> Result<(PathBuf, String, String), String> {
+    let mut home = PathBuf::from(".");
+    let mut pack_id = logline_lab_core::catalog::DEFAULT_PACK_ID.to_string();
+    let mut profile_id = logline_lab_core::catalog::DEFAULT_PROFILE_ID.to_string();
+    let mut index = 0;
+    while index < args.len() {
+        match args[index].as_str() {
+            "--home" => {
+                index += 1;
+                let value = args
+                    .get(index)
+                    .ok_or_else(|| "missing value for --home".to_string())?;
+                home = PathBuf::from(value);
+            }
+            "--pack" => {
+                index += 1;
+                pack_id = args
+                    .get(index)
+                    .ok_or_else(|| "missing value for --pack".to_string())?
+                    .to_string();
+            }
+            "--profile" => {
+                index += 1;
+                profile_id = args
+                    .get(index)
+                    .ok_or_else(|| "missing value for --profile".to_string())?
+                    .to_string();
+            }
+            value => return Err(format!("unexpected init argument: {value}")),
+        }
+        index += 1;
+    }
+    Ok((home, pack_id, profile_id))
+}
+
 fn candidate_add_args(args: &[String]) -> Result<(PathBuf, PathBuf), String> {
     let mut home = PathBuf::from(".");
     let mut file = None;
@@ -280,5 +317,5 @@ fn home_from_args(args: &[String]) -> Result<PathBuf, String> {
 
 fn print_help() {
     println!("Usage: logline-lab <command>");
-    println!("Commands: init [--home <path>], doctor [--home <path>], status [--home <path>], candidate add --file <path> [--home <path>], candidate list [--home <path>], candidate get <candidate_id> [--home <path>], ghost list [--home <path>], report generate daily-state [--home <path>], act validate [--file <path>], act emit --file <path>, lab, chat");
+    println!("Commands: init [--home <path>] [--pack <id>] [--profile <id>], doctor [--home <path>], status [--home <path>], candidate add --file <path> [--home <path>], candidate list [--home <path>], candidate get <candidate_id> [--home <path>], ghost list [--home <path>], report generate daily-state [--home <path>], act validate [--file <path>], act emit --file <path>, lab, chat");
 }

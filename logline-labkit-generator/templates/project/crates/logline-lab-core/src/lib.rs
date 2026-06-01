@@ -1,4 +1,5 @@
 pub mod candidates;
+pub mod catalog;
 pub mod ghosts;
 pub mod lab_home;
 pub mod reports;
@@ -10,6 +11,14 @@ use logline_act::{parse_act_json, ACT_SLOTS};
 
 pub fn init_lab_home(home: impl AsRef<Path>) -> std::io::Result<lab_home::InitReport> {
     LabHome::new(home.as_ref()).init()
+}
+
+pub fn init_lab_home_with_selection(
+    home: impl AsRef<Path>,
+    pack_id: &str,
+    profile_id: &str,
+) -> std::io::Result<lab_home::InitReport> {
+    LabHome::new(home.as_ref()).init_with_selection(pack_id, profile_id)
 }
 
 pub fn doctor_report_for(home: impl AsRef<Path>) -> lab_home::DoctorReport {

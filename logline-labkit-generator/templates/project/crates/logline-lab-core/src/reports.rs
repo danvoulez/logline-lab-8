@@ -109,6 +109,16 @@ fn render_daily_state_report(
     ghost_list: &GhostList,
     candidates: &[crate::candidates::CandidateMetadata],
 ) -> String {
+    let selected = lab_home.selected_pack_profile();
+    let pack_id = selected
+        .as_ref()
+        .map(|selection| selection.0.as_str())
+        .unwrap_or("unknown");
+    let profile_id = selected
+        .as_ref()
+        .map(|selection| selection.1.as_str())
+        .unwrap_or("unknown");
+    let profile = crate::catalog::known_profile(profile_id);
     let mut lines = vec![
         "# Daily Lab State".to_string(),
         String::new(),
@@ -121,6 +131,23 @@ fn render_daily_state_report(
         "It is not official spine truth, not evidence, not a receipt, and not remote sync."
             .to_string(),
         String::new(),
+        "## Pack/Profile".to_string(),
+        String::new(),
+        format!("- Pack: {pack_id}"),
+        format!("- Profile: {profile_id}"),
+        String::new(),
+        "## Profile Capability State".to_string(),
+        String::new(),
+    ];
+    if let Some(profile) = profile {
+        for capability in profile.capabilities {
+            lines.push(format!("- {}: {}", capability.key, capability.state));
+        }
+    } else {
+        lines.push("- unknown profile: unavailable/ghost".to_string());
+    }
+    lines.extend([
+        String::new(),
         "## Counts".to_string(),
         String::new(),
         format!("- Candidates: {}", candidates.len()),
@@ -128,7 +155,7 @@ fn render_daily_state_report(
         String::new(),
         "## Ghosts".to_string(),
         String::new(),
-    ];
+    ]);
     if ghost_list.ghosts.is_empty() {
         lines.push("- none listed locally".to_string());
     } else {

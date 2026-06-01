@@ -9,16 +9,16 @@ A local Lab home is an operational workspace. It is not canon, not an official s
 Default behavior uses the current directory as the Lab home. You can pass an explicit path:
 
 ```sh
-logline-lab init --home .
+logline-lab init --home . --pack santo-andre --profile local-offline
 logline-lab doctor --home .
 logline-lab status --home .
 ```
 
-`logline-lab init` creates `.logline-lab/` with an editable `lab.manifest.yaml`, `STATUS.md`, `GHOSTS.md`, and local operational directories for candidates, reports, ghosts, profiles, and packs. Init is idempotent and does not overwrite existing manifest/status/ghost files.
+`logline-lab init [--home <path>] [--pack <id>] [--profile <id>]` validates the selected pack/profile against the initial local catalog, creates `.logline-lab/` with an editable `lab.manifest.yaml`, `STATUS.md`, `GHOSTS.md`, and local operational directories for candidates, reports, ghosts, profiles, and packs. Defaults are `--pack santo-andre --profile local-offline`. Init is idempotent and does not overwrite existing manifest/status/ghost files.
 
-`logline-lab doctor` checks the local home structure, verifies `.logline-lab/candidates/` exists, and checks required generated project docs, examples, and schemas. An empty local candidate queue is healthy. Doctor returns non-zero when required local structure is missing.
+`logline-lab doctor` checks the local home structure, validates selected pack/profile ids from the manifest when present, verifies `.logline-lab/candidates/` exists, and checks required generated project docs, examples, and schemas. An empty local candidate queue is healthy. Supabase profile declarations are reported as Ghost/unconfigured rather than requiring env vars in this PR state. Doctor returns non-zero when required local structure is missing or a selected pack/profile id is unknown.
 
-`logline-lab status` reads the local workspace state, includes `candidate_count`, reports `local_candidate_queue: available` when initialized, lists Ghost records, includes report count/latest report when present, and reports remote spine, evidence registry, receipt closure, interactive UX, YAML parsing, and LLM translator surfaces as ghosted or unimplemented.
+`logline-lab status` reads the local workspace state, shows selected pack/profile, includes `candidate_count`, reports `local_candidate_queue: available` when initialized, lists Ghost records, includes report count/latest report when present, and reports profile capability state plus remote spine, evidence registry, receipt closure, interactive UX, YAML parsing, and LLM translator surfaces as ghosted or unimplemented.
 
 ## Candidate commands
 
@@ -54,7 +54,7 @@ Daily State is a local report/projection over the workspace:
 logline-lab report generate daily-state --home .
 ```
 
-`logline-lab report generate daily-state [--home <path>]` requires an initialized Lab home, counts local Candidates, reads local Ghosts, and writes `.logline-lab/reports/daily-state.md`. Reports are local read models and operator reports. Reports do not close receipts, do not prove evidence, do not write remote state, and do not create official truth.
+`logline-lab report generate daily-state [--home <path>]` requires an initialized Lab home, includes selected pack/profile and profile capability state, counts local Candidates, reads local Ghosts, and writes `.logline-lab/reports/daily-state.md`. Reports are local read models and operator reports. Reports do not close receipts, do not prove evidence, do not write remote state, and do not create official truth.
 
 ## Act commands
 

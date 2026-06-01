@@ -32,12 +32,19 @@ pub struct LabHome {
 pub struct InitReport {
     pub home: PathBuf,
     pub manifest: PathBuf,
+    pub pack_id: String,
+    pub profile_id: String,
+    pub authority: String,
     pub ghosts: Vec<&'static str>,
 }
 
 #[derive(Debug, Clone)]
 pub struct DoctorReport {
     pub home: PathBuf,
+    pub pack_id: Option<String>,
+    pub profile_id: Option<String>,
+    pub profile_capabilities: Vec<crate::catalog::ProfileCapability>,
+    pub authority: String,
     pub failures: Vec<String>,
     pub ghosts: Vec<&'static str>,
 }
@@ -45,6 +52,10 @@ pub struct DoctorReport {
 #[derive(Debug, Clone)]
 pub struct LabHomeStatus {
     pub home: PathBuf,
+    pub pack_id: Option<String>,
+    pub profile_id: Option<String>,
+    pub profile_capabilities: Vec<crate::catalog::ProfileCapability>,
+    pub authority: String,
     pub manifest_exists: bool,
     pub local_ready: bool,
     pub candidate_count: usize,
@@ -80,10 +91,23 @@ impl LabHome {
     }
 
     pub fn init(&self) -> io::Result<InitReport> {
+        let selection = crate::catalog::default_selection();
+        self.init_with_selection(selection.pack_id, selection.profile_id)
+    }
+
+    pub fn init_with_selection(&self, pack_id: &str, profile_id: &str) -> io::Result<InitReport> {
+        let selection = crate::catalog::validate_selection(pack_id, profile_id)
+            .map_err(|message| io::Error::new(io::ErrorKind::InvalidInput, message))?;
+        let profile =
+            crate::catalog::known_profile(selection.profile_id).expect("validated profile");
+        let ghosts = crate::catalog::selection_ghosts(&selection);
         fs::create_dir_all(self.local_dir())?;
-        write_if_missing(&self.manifest_path(), default_manifest())?;
-        write_if_missing(&self.status_path(), default_status())?;
-        write_if_missing(&self.ghosts_path(), default_ghosts())?;
+        write_if_missing(
+            &self.manifest_path(),
+            &default_manifest(&selection, profile),
+        )?;
+        write_if_missing(&self.status_path(), &default_status(&selection, profile))?;
+        write_if_missing(&self.ghosts_path(), &default_ghosts(&ghosts))?;
         for dir in LOCAL_DIRS {
             let path = self.local_dir().join(dir);
             fs::create_dir_all(&path)?;
@@ -92,7 +116,10 @@ impl LabHome {
         Ok(InitReport {
             home: self.home.clone(),
             manifest: self.manifest_path(),
-            ghosts: INITIAL_GHOSTS.to_vec(),
+            pack_id: selection.pack_id.to_string(),
+            profile_id: selection.profile_id.to_string(),
+            authority: profile.authority_summary.to_string(),
+            ghosts,
         })
     }
 
@@ -129,17 +156,55 @@ impl LabHome {
                     .to_string(),
             ),
         }
+
+        let selected = read_manifest_selection(&self.manifest_path());
+        let mut pack_id = selected.as_ref().map(|selection| selection.0.clone());
+        let mut profile_id = selected.as_ref().map(|selection| selection.1.clone());
+        let mut profile_capabilities = Vec::new();
+        let mut authority = "local workspace only; not official spine; not receipt".to_string();
+        let mut ghosts = INITIAL_GHOSTS.to_vec();
+
+        if let Some((pack, profile)) = selected {
+            if crate::catalog::known_pack(&pack).is_none() {
+                failures.push(format!("unknown pack: {pack}"));
+            }
+            match crate::catalog::known_profile(&profile) {
+                Some(profile_manifest) => {
+                    profile_capabilities = profile_manifest.capabilities.to_vec();
+                    authority = profile_manifest.authority_summary.to_string();
+                }
+                None => failures.push(format!("unknown profile: {profile}")),
+            }
+            if let Ok(selection) = crate::catalog::validate_selection(&pack, &profile) {
+                ghosts = crate::catalog::selection_ghosts(&selection);
+                pack_id = Some(selection.pack_id.to_string());
+                profile_id = Some(selection.profile_id.to_string());
+            }
+        }
+
         DoctorReport {
             home: self.home.clone(),
+            pack_id,
+            profile_id,
+            profile_capabilities,
+            authority,
             failures,
-            ghosts: INITIAL_GHOSTS.to_vec(),
+            ghosts,
         }
+    }
+
+    pub fn selected_pack_profile(&self) -> Option<(String, String)> {
+        read_manifest_selection(&self.manifest_path())
     }
 
     pub fn status(&self) -> LabHomeStatus {
         let doctor = self.doctor();
         LabHomeStatus {
             home: self.home.clone(),
+            pack_id: doctor.pack_id.clone(),
+            profile_id: doctor.profile_id.clone(),
+            profile_capabilities: doctor.profile_capabilities.clone(),
+            authority: doctor.authority.clone(),
             manifest_exists: self.manifest_path().is_file(),
             local_ready: doctor.failures.is_empty(),
             candidate_count: self.candidate_count(),
@@ -163,7 +228,9 @@ impl InitReport {
             "initialized local LogLine Lab home".to_string(),
             format!("home: {}", self.home.display()),
             format!("manifest: {}", self.manifest.display()),
-            "authority: local workspace only; not official spine; not receipt".to_string(),
+            format!("pack: {}", self.pack_id),
+            format!("profile: {}", self.profile_id),
+            format!("authority: {}", self.authority),
             "ghosts:".to_string(),
         ];
         for ghost in &self.ghosts {
@@ -179,24 +246,46 @@ impl DoctorReport {
     }
 
     pub fn to_text(&self) -> String {
-        if self.is_ok() {
-            return [
-                "doctor: ok".to_string(),
-                format!("home: {}", self.home.display()),
-                "scope: local workspace only".to_string(),
-                "local candidate queue: available".to_string(),
-                "remote spine: ghost remote-spine-unconfigured".to_string(),
-            ]
-            .join("\n");
-        }
         let mut lines = vec![
-            "doctor: failed".to_string(),
+            if self.is_ok() {
+                "doctor: ok"
+            } else {
+                "doctor: failed"
+            }
+            .to_string(),
             format!("home: {}", self.home.display()),
-            "scope: local workspace only".to_string(),
-            "failures:".to_string(),
+            format!("scope: {}", self.authority),
         ];
-        for failure in &self.failures {
-            lines.push(format!("  - {failure}"));
+        if let Some(pack_id) = &self.pack_id {
+            if crate::catalog::known_pack(pack_id).is_some() {
+                lines.push(format!("pack: {pack_id} known"));
+            } else {
+                lines.push(format!("unknown pack: {pack_id}"));
+            }
+        }
+        if let Some(profile_id) = &self.profile_id {
+            if crate::catalog::known_profile(profile_id).is_some() {
+                lines.push(format!("profile: {profile_id} known"));
+            } else {
+                lines.push(format!("unknown profile: {profile_id}"));
+            }
+        }
+        lines.push("local candidate queue: available".to_string());
+        for capability in &self.profile_capabilities {
+            if capability.key == "remote_spine" {
+                lines.push(format!("remote spine: {}", capability.state));
+            }
+        }
+        if self.profile_capabilities.is_empty() {
+            lines.push("remote spine: ghost remote-spine-unconfigured".to_string());
+        } else if self.profile_id.as_deref() == Some(crate::catalog::DEFAULT_PROFILE_ID) {
+            lines.push("remote spine: ghost remote-spine-unconfigured".to_string());
+        }
+        if !self.is_ok() {
+            lines.push("failures:".to_string());
+            for failure in &self.failures {
+                lines.push(format!("  - {failure}"));
+            }
         }
         lines.push("ghosts:".to_string());
         for ghost in &self.ghosts {
@@ -211,6 +300,11 @@ impl LabHomeStatus {
         let mut lines = vec![
             "status: local LogLine Lab workspace".to_string(),
             format!("home: {}", self.home.display()),
+            format!("pack: {}", self.pack_id.as_deref().unwrap_or("unknown")),
+            format!(
+                "profile: {}",
+                self.profile_id.as_deref().unwrap_or("unknown")
+            ),
             format!("manifest exists: {}", yes_no(self.manifest_exists)),
             format!(
                 "local workspace status: {}",
@@ -243,12 +337,23 @@ impl LabHomeStatus {
         for ghost in &self.ghosts {
             lines.push(format!("  - {ghost}"));
         }
+        lines.push("profile capability state:".to_string());
+        for capability in &self.profile_capabilities {
+            lines.push(format!("  - {}: {}", capability.key, capability.state));
+        }
+        let remote_state = self
+            .profile_capabilities
+            .iter()
+            .find(|capability| capability.key == "remote_spine")
+            .map(|capability| capability.state)
+            .unwrap_or("ghost/unconfigured");
         lines.extend([
+            format!("remote_spine: {remote_state}"),
             "remote spine status: ghost/unconfigured".to_string(),
             "receipt status: unavailable/unimplemented".to_string(),
             "interactive UX: ghost/unimplemented".to_string(),
             "LLM translator: ghost/unimplemented".to_string(),
-            "authority: local workspace only; not official spine".to_string(),
+            format!("authority: {}", self.authority),
         ]);
         lines.join("\n")
     }
@@ -325,14 +430,56 @@ fn yes_no(value: bool) -> &'static str {
     }
 }
 
-fn default_manifest() -> &'static str {
-    "manifest_version: 1\nlab:\n  id: local-lab\n  name: Local LogLine Lab\n  kind: logline_lab_instance\nloads:\n  canon: referenced\n  pack: none\n  profile: local-workspace\nrules:\n  act_shape: nine-slot\n  local_home_is_authority: false\n  projections_are_read_models: true\n  llm_is_authority: false\n"
+fn read_manifest_selection(path: &Path) -> Option<(String, String)> {
+    let text = fs::read_to_string(path).ok()?;
+    let mut in_selected = false;
+    let mut pack = None;
+    let mut profile = None;
+    for line in text.lines() {
+        if line.trim() == "selected:" {
+            in_selected = true;
+            continue;
+        }
+        if in_selected && !line.starts_with("  ") && !line.trim().is_empty() {
+            in_selected = false;
+        }
+        if in_selected {
+            let trimmed = line.trim();
+            if let Some(value) = trimmed.strip_prefix("pack:") {
+                pack = Some(value.trim().to_string());
+            } else if let Some(value) = trimmed.strip_prefix("profile:") {
+                profile = Some(value.trim().to_string());
+            }
+        }
+    }
+    Some((pack?, profile?))
 }
 
-fn default_status() -> &'static str {
-    "# Local LogLine Lab Status\n\nStatus: local workspace initialized.\n\nAuthority: local workspace only; not official spine; not receipt.\n\nRemote spine: Ghost remote-spine-unconfigured.\nReceipt closure: Ghost receipt-closure-unimplemented.\n"
+fn default_manifest(
+    selection: &crate::catalog::SelectedPackProfile,
+    profile: &crate::catalog::ProfileManifest,
+) -> String {
+    format!(
+        "manifest_version: 1\nlab:\n  id: local-lab\n  name: Local LogLine Lab\n  kind: logline_lab_instance\nselected:\n  pack: {}\n  profile: {}\nloads:\n  canon: referenced\n  pack: selected local practice, not canon\n  profile: selected capability declaration\nauthority:\n  summary: {}\n  canon_amendment: false\n  local_workspace_only: true\n  receipt_closure: false\nrules:\n  act_shape: nine-slot\n  local_home_is_authority: false\n  projections_are_read_models: true\n  llm_is_authority: false\n",
+        selection.pack_id, selection.profile_id, profile.authority_summary
+    )
 }
 
-fn default_ghosts() -> &'static str {
-    "# Local LogLine Lab Ghosts\n\n- remote-spine-unconfigured\n- evidence-registry-unimplemented\n- receipt-closure-unimplemented\n- interactive-lab-surface-unimplemented\n- llm-translator-unimplemented\n- yaml-act-parser-unimplemented\n"
+fn default_status(
+    selection: &crate::catalog::SelectedPackProfile,
+    profile: &crate::catalog::ProfileManifest,
+) -> String {
+    format!(
+        "# Local LogLine Lab Status\n\nStatus: local workspace initialized.\n\nPack: {}.\nProfile: {}.\n\nAuthority: {}.\n\nRemote spine: Ghost remote-spine-unconfigured unless selected profile only declares it unimplemented/unconfigured.\nReceipt closure: Ghost receipt-closure-unimplemented.\n",
+        selection.pack_id, selection.profile_id, profile.authority_summary
+    )
+}
+
+fn default_ghosts(ghosts: &[&str]) -> String {
+    let mut lines = vec!["# Local LogLine Lab Ghosts".to_string(), String::new()];
+    for ghost in ghosts {
+        lines.push(format!("- {ghost}"));
+    }
+    lines.push(String::new());
+    lines.join("\n")
 }

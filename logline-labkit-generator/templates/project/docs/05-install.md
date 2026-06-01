@@ -5,12 +5,12 @@ Run `./install.sh` or `cargo install --path crates/logline-lab-cli` from the gen
 After building, initialize a local operational workspace with:
 
 ```sh
-logline-lab init --home .
+logline-lab init --home . --pack santo-andre --profile local-offline
 logline-lab doctor --home .
 logline-lab status --home .
 ```
 
-The initialized home is local workspace state only. It is not canon, not an official spine, and not a receipt store.
+The default init selection is `santo-andre` plus `local-offline`; choose another known pack/profile explicitly if needed. The initialized home is local workspace state only. It is not canon, not an official spine, and not a receipt store.
 
 
 ## Local Candidate smoke loop
