@@ -15,7 +15,10 @@ REQUIRED = [
     "manifests/lab.manifest.example.yaml", "manifests/santo-andre.manifest.example.yaml", "manifests/personal-offline.manifest.example.yaml",
     "profiles/supabase.profile.yaml", "profiles/local-offline.profile.yaml",
     "packages/santo-andre/package.yaml", "packages/personal-offline/package.yaml",
-    "examples/acts/minimal.act.json", "scripts/smoke-local.sh", "scripts/scan-forbidden-markers.sh", "scripts/command-matrix.sh",
+    "examples/acts/minimal.act.json", "examples/candidates/ugly-candidate.json",
+    "examples/invalid/missing-confirmed-by.json", "examples/invalid/extra-selected-branch.json", "examples/invalid/extra-runtime-envelope.json",
+    "examples/invalid/malformed.json", "examples/invalid/extra-top-level-field.json",
+    "crates/logline-act/tests/act_validation.rs", "crates/logline-lab-cli/tests/cli_act.rs", "scripts/smoke-local.sh", "scripts/scan-forbidden-markers.sh", "scripts/command-matrix.sh",
     "reports/GHOSTS.md", "reports/COMMAND_MATRIX.md", "reports/FORBIDDEN_MARKER_SCAN.md",
 ]
 

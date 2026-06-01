@@ -12,3 +12,11 @@ required_paths:
   - docs/contributing/GENERATOR_WORKFLOW.md
   - docs/contributing/AUTHORITY_BOUNDARIES.md
   - reports/GHOSTS.md
+  - examples/candidates/ugly-candidate.json
+  - examples/invalid/missing-confirmed-by.json
+  - examples/invalid/extra-selected-branch.json
+  - examples/invalid/extra-runtime-envelope.json
+  - examples/invalid/malformed.json
+  - examples/invalid/extra-top-level-field.json
+  - crates/logline-act/tests/act_validation.rs
+  - crates/logline-lab-cli/tests/cli_act.rs

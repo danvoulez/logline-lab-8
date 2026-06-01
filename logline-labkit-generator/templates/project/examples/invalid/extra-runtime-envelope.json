@@ -7,5 +7,6 @@
   "if_ok": {},
   "if_doubt": {},
   "if_not": {},
-  "status": "candidate"
+  "status": "candidate",
+  "runtime_envelope": {}
 }
