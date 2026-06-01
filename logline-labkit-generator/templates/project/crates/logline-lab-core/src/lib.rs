@@ -1,3 +1,4 @@
+pub mod candidates;
 pub mod lab_home;
 
 use std::path::Path;
@@ -15,6 +16,26 @@ pub fn doctor_report_for(home: impl AsRef<Path>) -> lab_home::DoctorReport {
 
 pub fn status_report_for(home: impl AsRef<Path>) -> lab_home::LabHomeStatus {
     LabHome::new(home.as_ref()).status()
+}
+
+pub fn capture_candidate(
+    home: impl AsRef<Path>,
+    source_file: impl AsRef<Path>,
+) -> Result<candidates::CaptureReport, candidates::CandidateError> {
+    LabHome::new(home.as_ref()).capture_candidate(source_file.as_ref())
+}
+
+pub fn list_candidates(
+    home: impl AsRef<Path>,
+) -> Result<candidates::CandidateList, candidates::CandidateError> {
+    LabHome::new(home.as_ref()).list_candidates()
+}
+
+pub fn get_candidate(
+    home: impl AsRef<Path>,
+    candidate_id: &str,
+) -> Result<candidates::CandidateRecord, candidates::CandidateError> {
+    LabHome::new(home.as_ref()).get_candidate(candidate_id)
 }
 
 pub fn doctor_report() -> String {

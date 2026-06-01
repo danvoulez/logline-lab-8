@@ -6,6 +6,7 @@ required_paths:
   - crates/logline-lab-core
   - crates/logline-lab-cli
   - crates/logline-lab-core/src/lab_home.rs
+  - crates/logline-lab-core/src/candidates.rs
   - docs/00-overview.md
   - .github/pull_request_template.md
   - docs/contributing/PR_PRACTICES.md
@@ -22,3 +23,4 @@ required_paths:
   - crates/logline-act/tests/act_validation.rs
   - crates/logline-lab-cli/tests/cli_act.rs
   - crates/logline-lab-cli/tests/lab_home.rs
+  - crates/logline-lab-cli/tests/candidates.rs

@@ -16,9 +16,27 @@ logline-lab status --home .
 
 `logline-lab init` creates `.logline-lab/` with an editable `lab.manifest.yaml`, `STATUS.md`, `GHOSTS.md`, and local operational directories for candidates, reports, ghosts, profiles, and packs. Init is idempotent and does not overwrite existing manifest/status/ghost files.
 
-`logline-lab doctor` checks the local home structure and required generated project docs, examples, and schemas. It returns non-zero when required local structure is missing.
+`logline-lab doctor` checks the local home structure, verifies `.logline-lab/candidates/` exists, and checks required generated project docs, examples, and schemas. An empty local candidate queue is healthy. Doctor returns non-zero when required local structure is missing.
 
-`logline-lab status` reads the local workspace state, lists Ghost records, and reports remote spine, receipt closure, interactive UX, and LLM translator surfaces as ghosted or unimplemented.
+`logline-lab status` reads the local workspace state, includes `candidate_count`, reports `local_candidate_queue: available` when initialized, lists Ghost records, and reports remote spine, evidence registry, receipt closure, interactive UX, YAML parsing, and LLM translator surfaces as ghosted or unimplemented.
+
+## Candidate commands
+
+Candidate capture is local operational capture for the first capture loop:
+
+```sh
+logline-lab candidate add --home . --file examples/acts/minimal.act.json
+logline-lab candidate list --home .
+logline-lab candidate get <candidate_id> --home .
+```
+
+`logline-lab candidate add --file <path> [--home <path>]` requires an initialized Lab home and validates the input file with the canonical nine-slot JSON Act validator. Invalid Acts are rejected before any Candidate record is created. Valid input is copied unchanged into `.logline-lab/candidates/<candidate_id>/candidate.json`, with lightweight metadata in `metadata.json`.
+
+`logline-lab candidate list [--home <path>]` reads only `.logline-lab/candidates/` and reports count, ids, timestamps, and Candidate status where metadata is available.
+
+`logline-lab candidate get <candidate_id> [--home <path>]` prints metadata and the captured Candidate content. Missing Candidates return non-zero with `candidate not found: <candidate_id>`.
+
+The local candidate queue is a local capture queue and local workspace record only. It does not admit an Act to any remote spine, does not close receipts, does not prove truth, and is not remote synced.
 
 ## Act commands
 

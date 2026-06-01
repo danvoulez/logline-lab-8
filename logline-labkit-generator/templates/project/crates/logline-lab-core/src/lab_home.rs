@@ -1,4 +1,7 @@
-use std::{env, fs, io, path::{Path, PathBuf}};
+use std::{
+    env, fs, io,
+    path::{Path, PathBuf},
+};
 
 pub const LOCAL_DIR: &str = ".logline-lab";
 pub const MANIFEST_FILE: &str = "lab.manifest.yaml";
@@ -44,6 +47,8 @@ pub struct LabHomeStatus {
     pub home: PathBuf,
     pub manifest_exists: bool,
     pub local_ready: bool,
+    pub candidate_count: usize,
+    pub local_candidate_queue_available: bool,
     pub ghosts: Vec<String>,
 }
 
@@ -93,7 +98,11 @@ impl LabHome {
         let mut failures = Vec::new();
         require_dir(&mut failures, &self.home, "lab home");
         require_dir(&mut failures, &self.local_dir(), ".logline-lab/");
-        require_file(&mut failures, &self.manifest_path(), ".logline-lab/lab.manifest.yaml");
+        require_file(
+            &mut failures,
+            &self.manifest_path(),
+            ".logline-lab/lab.manifest.yaml",
+        );
         require_file(&mut failures, &self.ghosts_path(), ".logline-lab/GHOSTS.md");
         require_file(&mut failures, &self.status_path(), ".logline-lab/STATUS.md");
         for dir in LOCAL_DIRS {
@@ -103,6 +112,7 @@ impl LabHome {
                 &format!(".logline-lab/{dir}/"),
             );
         }
+        check_candidate_records(&mut failures, &self.local_dir().join("candidates"));
         match find_project_root() {
             Some(root) => {
                 for required in PROJECT_REQUIRED_PATHS {
@@ -112,9 +122,16 @@ impl LabHome {
                     }
                 }
             }
-            None => failures.push("missing generated project root: required docs/examples/schemas not found".to_string()),
+            None => failures.push(
+                "missing generated project root: required docs/examples/schemas not found"
+                    .to_string(),
+            ),
         }
-        DoctorReport { home: self.home.clone(), failures, ghosts: INITIAL_GHOSTS.to_vec() }
+        DoctorReport {
+            home: self.home.clone(),
+            failures,
+            ghosts: INITIAL_GHOSTS.to_vec(),
+        }
     }
 
     pub fn status(&self) -> LabHomeStatus {
@@ -123,8 +140,13 @@ impl LabHome {
             home: self.home.clone(),
             manifest_exists: self.manifest_path().is_file(),
             local_ready: doctor.failures.is_empty(),
+            candidate_count: self.candidate_count(),
+            local_candidate_queue_available: self.local_dir().join("candidates").is_dir(),
             ghosts: read_ghost_keys(&self.ghosts_path()).unwrap_or_else(|_| {
-                INITIAL_GHOSTS.iter().map(|ghost| (*ghost).to_string()).collect()
+                INITIAL_GHOSTS
+                    .iter()
+                    .map(|ghost| (*ghost).to_string())
+                    .collect()
             }),
         }
     }
@@ -157,8 +179,10 @@ impl DoctorReport {
                 "doctor: ok".to_string(),
                 format!("home: {}", self.home.display()),
                 "scope: local workspace only".to_string(),
+                "local candidate queue: available".to_string(),
                 "remote spine: ghost remote-spine-unconfigured".to_string(),
-            ].join("\n");
+            ]
+            .join("\n");
         }
         let mut lines = vec![
             "doctor: failed".to_string(),
@@ -183,7 +207,23 @@ impl LabHomeStatus {
             "status: local LogLine Lab workspace".to_string(),
             format!("home: {}", self.home.display()),
             format!("manifest exists: {}", yes_no(self.manifest_exists)),
-            format!("local workspace status: {}", if self.local_ready { "ready" } else { "missing required local structure" }),
+            format!(
+                "local workspace status: {}",
+                if self.local_ready {
+                    "ready"
+                } else {
+                    "missing required local structure"
+                }
+            ),
+            format!("candidate_count: {}", self.candidate_count),
+            format!(
+                "local_candidate_queue: {}",
+                if self.local_candidate_queue_available {
+                    "available"
+                } else {
+                    "missing"
+                }
+            ),
             format!("ghost count: {}", self.ghosts.len()),
             "ghosts:".to_string(),
         ];
@@ -195,7 +235,7 @@ impl LabHomeStatus {
             "receipt status: unavailable/unimplemented".to_string(),
             "interactive UX: ghost/unimplemented".to_string(),
             "LLM translator: ghost/unimplemented".to_string(),
-            "authority: local workspace only; not official spine; not receipt".to_string(),
+            "authority: local workspace only; not official spine".to_string(),
         ]);
         lines.join("\n")
     }
@@ -204,11 +244,43 @@ impl LabHomeStatus {
 pub fn find_project_root() -> Option<PathBuf> {
     let mut dir = env::current_dir().ok()?;
     loop {
-        if PROJECT_REQUIRED_PATHS.iter().all(|required| dir.join(required).exists()) {
+        if PROJECT_REQUIRED_PATHS
+            .iter()
+            .all(|required| dir.join(required).exists())
+        {
             return Some(dir);
         }
         if !dir.pop() {
             return None;
+        }
+    }
+}
+
+fn check_candidate_records(failures: &mut Vec<String>, candidates_dir: &Path) {
+    if !candidates_dir.is_dir() {
+        return;
+    }
+    let Ok(entries) = fs::read_dir(candidates_dir) else {
+        failures.push("unable to read .logline-lab/candidates/".to_string());
+        return;
+    };
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.is_dir() {
+            let metadata = path.join("metadata.json");
+            let candidate = path.join("candidate.json");
+            if !metadata.is_file() {
+                failures.push(format!(
+                    "missing candidate metadata: {}",
+                    metadata.display()
+                ));
+            }
+            if !candidate.is_file() {
+                failures.push(format!(
+                    "missing candidate content: {}",
+                    candidate.display()
+                ));
+            }
         }
     }
 }
@@ -233,14 +305,22 @@ fn write_if_missing(path: &Path, content: &str) -> io::Result<()> {
 }
 
 fn yes_no(value: bool) -> &'static str {
-    if value { "yes" } else { "no" }
+    if value {
+        "yes"
+    } else {
+        "no"
+    }
 }
 
 fn read_ghost_keys(path: &Path) -> io::Result<Vec<String>> {
     let text = fs::read_to_string(path)?;
-    let ghosts = text.lines()
+    let ghosts = text
+        .lines()
         .map(str::trim)
-        .filter_map(|line| line.strip_prefix("- Ghost: ").or_else(|| line.strip_prefix("- ghost: ")))
+        .filter_map(|line| {
+            line.strip_prefix("- Ghost: ")
+                .or_else(|| line.strip_prefix("- ghost: "))
+        })
         .map(str::trim)
         .filter(|line| !line.is_empty())
         .map(ToOwned::to_owned)
