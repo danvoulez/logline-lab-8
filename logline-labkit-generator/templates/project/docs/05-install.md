@@ -46,12 +46,13 @@ logline-lab doctor --home ./demo-lab
 logline-lab act validate --file examples/acts/minimal.act.json
 logline-lab candidate add --home ./demo-lab --file examples/acts/minimal.act.json
 logline-lab candidate list --home ./demo-lab
+logline-lab candidate index rebuild --home ./demo-lab
 logline-lab ghost list --home ./demo-lab
 logline-lab report generate daily-state --home ./demo-lab
 logline-lab status --home ./demo-lab
 ```
 
-The initialized home is local workspace state only. It is not an official spine, not a receipt store, not evidence proof, and not remote sync.
+The initialized home includes `.logline-lab/candidates/index.json` as a local Candidate index for listing/status/reporting. The Candidate index is local operational metadata, not a ledger, official spine, receipt, evidence, or source of truth. The initialized home is local workspace state only. It is not an official spine, not a receipt store, not evidence proof, and not remote sync.
 
 ## What install does and does not do
 
@@ -94,6 +95,16 @@ If you used a custom prefix, replace `$HOME/.local` with that prefix.
 ### `doctor` reports Ghosts
 
 Some Ghosts are expected. The local profile works while remote spine writes, receipt closure, evidence registry, interactive Lab surface, LLM translator, and YAML Act parsing remain unimplemented.
+
+### Candidate index warnings
+
+If `doctor` reports `candidate index: missing`, rebuild local queue metadata from candidate directories:
+
+```bash
+logline-lab candidate index rebuild --home ./demo-lab
+```
+
+If `doctor` reports `candidate index: malformed`, inspect the local file and rebuild only when you intend to replace local queue metadata.
 
 ### `candidate add` fails before init
 

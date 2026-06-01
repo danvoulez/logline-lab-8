@@ -6,7 +6,7 @@ pub mod reports;
 
 use std::path::Path;
 
-use lab_home::LabHome;
+pub use lab_home::LabHome;
 use logline_act::{parse_act_json, ACT_SLOTS};
 
 pub fn init_lab_home(home: impl AsRef<Path>) -> std::io::Result<lab_home::InitReport> {

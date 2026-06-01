@@ -56,7 +56,7 @@ REQUIRED = [
     "examples/acts/minimal.act.json", "examples/candidates/ugly-candidate.json",
     "examples/invalid/missing-confirmed-by.json", "examples/invalid/extra-selected-branch.json", "examples/invalid/extra-runtime-envelope.json",
     "examples/invalid/malformed.json", "examples/invalid/extra-top-level-field.json",
-    "crates/logline-act/tests/act_validation.rs", "crates/logline-lab-cli/tests/cli_act.rs", "crates/logline-lab-cli/tests/lab_home.rs", "crates/logline-lab-cli/tests/candidates.rs", "crates/logline-lab-cli/tests/reports.rs", "crates/logline-lab-cli/tests/packs_profiles.rs", "crates/logline-lab-cli/tests/help_version.rs", "scripts/smoke-local.sh", "scripts/scan-forbidden-markers.sh", "scripts/command-matrix.sh",
+    "crates/logline-act/tests/act_validation.rs", "crates/logline-lab-cli/tests/cli_act.rs", "crates/logline-lab-cli/tests/lab_home.rs", "crates/logline-lab-cli/tests/candidates.rs", "crates/logline-lab-cli/tests/candidate_index.rs", "crates/logline-lab-cli/tests/reports.rs", "crates/logline-lab-cli/tests/packs_profiles.rs", "crates/logline-lab-cli/tests/help_version.rs", "scripts/smoke-local.sh", "scripts/scan-forbidden-markers.sh", "scripts/command-matrix.sh",
     "reports/GHOSTS.md", "reports/COMMAND_MATRIX.md", "reports/FORBIDDEN_MARKER_SCAN.md",
 ]
 

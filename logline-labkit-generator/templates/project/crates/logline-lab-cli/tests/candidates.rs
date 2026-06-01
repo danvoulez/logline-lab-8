@@ -60,6 +60,7 @@ fn candidate_add_after_init_creates_candidate_files() {
     );
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(stdout.contains("candidate captured"));
+    assert!(stdout.contains("index: available"));
     assert!(stdout.contains(
         "authority: local capture only; not official spine; not receipt; not remote synced"
     ));
@@ -124,7 +125,11 @@ fn candidate_add_invalid_selected_branch_fails_without_candidate() {
     let entries = fs::read_dir(home.join(".logline-lab/candidates"))
         .expect("read candidates")
         .count();
-    assert_eq!(entries, 1, "only .keep should exist");
+    assert_eq!(entries, 2, "only .keep and index.json should exist");
+    let index_text =
+        fs::read_to_string(home.join(".logline-lab/candidates/index.json")).expect("read index");
+    assert!(index_text.contains("\"candidates\": ["));
+    assert!(!index_text.contains("cand_"));
     let _ = fs::remove_dir_all(home);
 }
 
@@ -155,6 +160,7 @@ fn candidate_list_after_one_add_shows_count_and_id() {
     );
     let stdout = String::from_utf8_lossy(&list.stdout);
     assert!(stdout.contains("candidates: 1"));
+    assert!(stdout.contains("index: available"));
     assert!(stdout.contains(id));
     assert!(stdout.contains("candidate captured_at="));
     let _ = fs::remove_dir_all(home);
@@ -238,6 +244,7 @@ fn status_includes_candidate_count() {
     );
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(stdout.contains("candidate_count: 1"));
+    assert!(stdout.contains("candidate_index: available"));
     assert!(stdout.contains("local_candidate_queue: available"));
     assert!(stdout.contains("authority: local workspace only; not official spine"));
     let _ = fs::remove_dir_all(home);

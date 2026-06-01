@@ -46,6 +46,10 @@ pub struct DoctorReport {
     pub profile_capabilities: Vec<crate::catalog::ProfileCapability>,
     pub authority: String,
     pub failures: Vec<String>,
+    pub warnings: Vec<String>,
+    pub candidate_index_state: crate::candidates::CandidateIndexState,
+    pub candidate_index_entries: usize,
+    pub candidate_directories: usize,
     pub ghosts: Vec<&'static str>,
 }
 
@@ -59,6 +63,7 @@ pub struct LabHomeStatus {
     pub manifest_exists: bool,
     pub local_ready: bool,
     pub candidate_count: usize,
+    pub candidate_index_state: crate::candidates::CandidateIndexState,
     pub local_candidate_queue_available: bool,
     pub ghosts: Vec<String>,
     pub reports_available: usize,
@@ -113,6 +118,7 @@ impl LabHome {
             fs::create_dir_all(&path)?;
             write_if_missing(&path.join(".keep"), "")?;
         }
+        self.initialize_candidate_index_if_missing()?;
         Ok(InitReport {
             home: self.home.clone(),
             manifest: self.manifest_path(),
@@ -142,6 +148,9 @@ impl LabHome {
             );
         }
         check_candidate_records(&mut failures, &self.local_dir().join("candidates"));
+        let candidate_index_inspection = self.candidate_index_inspection();
+        failures.extend(candidate_index_inspection.failures.clone());
+        let warnings = candidate_index_inspection.warnings.clone();
         match find_project_root() {
             Some(root) => {
                 for required in PROJECT_REQUIRED_PATHS {
@@ -189,6 +198,10 @@ impl LabHome {
             profile_capabilities,
             authority,
             failures,
+            warnings,
+            candidate_index_state: candidate_index_inspection.state,
+            candidate_index_entries: candidate_index_inspection.entries,
+            candidate_directories: candidate_index_inspection.directories,
             ghosts,
         }
     }
@@ -199,6 +212,7 @@ impl LabHome {
 
     pub fn status(&self) -> LabHomeStatus {
         let doctor = self.doctor();
+        let candidate_listing = self.candidate_listing_for_status();
         LabHomeStatus {
             home: self.home.clone(),
             pack_id: doctor.pack_id.clone(),
@@ -207,7 +221,14 @@ impl LabHome {
             authority: doctor.authority.clone(),
             manifest_exists: self.manifest_path().is_file(),
             local_ready: doctor.failures.is_empty(),
-            candidate_count: self.candidate_count(),
+            candidate_count: candidate_listing
+                .as_ref()
+                .map(|list| list.records.len())
+                .unwrap_or(0),
+            candidate_index_state: candidate_listing
+                .as_ref()
+                .map(|list| list.index_status)
+                .unwrap_or(crate::candidates::CandidateIndexState::Malformed),
             local_candidate_queue_available: self.local_dir().join("candidates").is_dir(),
             ghosts: crate::ghosts::read_ghost_keys_from_markdown(&self.ghosts_path())
                 .unwrap_or_else(|_| {
@@ -219,6 +240,19 @@ impl LabHome {
             reports_available: self.report_count(),
             latest_report: self.latest_report_path(),
         }
+    }
+
+    fn candidate_listing_for_status(
+        &self,
+    ) -> Result<crate::candidates::CandidateList, crate::candidates::CandidateError> {
+        if !self.local_dir().join("candidates").is_dir() {
+            return Ok(crate::candidates::CandidateList {
+                home: self.home.clone(),
+                records: Vec::new(),
+                index_status: crate::candidates::CandidateIndexState::Missing,
+            });
+        }
+        self.list_candidates()
     }
 }
 
@@ -271,6 +305,30 @@ impl DoctorReport {
             }
         }
         lines.push("local candidate queue: available".to_string());
+        lines.push(format!(
+            "candidate index: {}",
+            self.candidate_index_state.as_cli_status()
+        ));
+        lines.push(format!(
+            "candidate index entries: {}",
+            self.candidate_index_entries
+        ));
+        lines.push(format!(
+            "candidate directories: {}",
+            self.candidate_directories
+        ));
+        lines.push(format!(
+            "candidate index consistency: {}",
+            if self
+                .failures
+                .iter()
+                .any(|failure| failure.contains("candidate index"))
+            {
+                "failed"
+            } else {
+                "ok"
+            }
+        ));
         for capability in &self.profile_capabilities {
             if capability.key == "remote_spine" {
                 lines.push(format!("remote spine: {}", capability.state));
@@ -280,6 +338,12 @@ impl DoctorReport {
             lines.push("remote spine: ghost remote-spine-unconfigured".to_string());
         } else if self.profile_id.as_deref() == Some(crate::catalog::DEFAULT_PROFILE_ID) {
             lines.push("remote spine: ghost remote-spine-unconfigured".to_string());
+        }
+        if !self.warnings.is_empty() {
+            lines.push("warnings:".to_string());
+            for warning in &self.warnings {
+                lines.push(format!("  - {warning}"));
+            }
         }
         if !self.is_ok() {
             lines.push("failures:".to_string());
@@ -315,6 +379,10 @@ impl LabHomeStatus {
                 }
             ),
             format!("candidate_count: {}", self.candidate_count),
+            format!(
+                "candidate_index: {}",
+                self.candidate_index_state.as_cli_status()
+            ),
             format!(
                 "local_candidate_queue: {}",
                 if self.local_candidate_queue_available {
