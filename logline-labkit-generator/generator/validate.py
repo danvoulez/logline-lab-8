@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import subprocess
 import sys
+
+from render import (
+    BLUEPRINTS,
+    PACK_BLUEPRINTS,
+    PROFILE_BLUEPRINTS,
+    REQUIRED_GHOSTS,
+    load_blueprint,
+)
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -17,6 +26,20 @@ def repository_zip_files():
             continue
         zip_files.append(relative)
     return sorted(zip_files)
+
+
+def tracked_zip_files():
+    result = subprocess.run(
+        ["git", "ls-files", "*.zip"],
+        cwd=ROOT,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+    if result.returncode != 0:
+        return [f"git ls-files failed: {result.stderr.strip()}"]
+    return [line for line in result.stdout.splitlines() if line.strip()]
 
 
 REQUIRED = [
@@ -38,6 +61,47 @@ REQUIRED = [
 ]
 
 
+def contains_line(text, needle):
+    return any(line.strip() == needle for line in text.splitlines())
+
+
+def validate_blueprint_outputs():
+    errors = []
+    command_matrix = DIST / "reports" / "COMMAND_MATRIX.md"
+    ghost_report = DIST / "reports" / "GHOSTS.md"
+    command_text = command_matrix.read_text(encoding="utf-8") if command_matrix.exists() else ""
+    ghost_text = ghost_report.read_text(encoding="utf-8") if ghost_report.exists() else ""
+
+    cli = load_blueprint(BLUEPRINTS / "cli.commands.yaml")
+    for command in cli.get("commands", []):
+        if command["command"] not in command_text:
+            errors.append(f"command matrix missing command: {command['command']}")
+        if command["status"] not in command_text:
+            errors.append(f"command matrix missing status for {command['command']}: {command['status']}")
+
+    for rel in PACK_BLUEPRINTS:
+        if not (DIST / rel).exists():
+            errors.append(f"missing generated pack manifest: {rel}")
+    for rel in PROFILE_BLUEPRINTS:
+        if not (DIST / rel).exists():
+            errors.append(f"missing generated profile manifest: {rel}")
+
+    santo = (DIST / "packages/santo-andre/package.yaml").read_text(encoding="utf-8")
+    personal = (DIST / "packages/personal-offline/package.yaml").read_text(encoding="utf-8")
+    supabase = (DIST / "profiles/supabase.profile.yaml").read_text(encoding="utf-8")
+    if contains_line(santo, "official: true") or contains_line(santo, "official_pack: true"):
+        errors.append("Santo André manifest must not declare official: true")
+    if contains_line(personal, "official: true") or contains_line(personal, "official_pack: true"):
+        errors.append("Personal Offline manifest must not declare official: true")
+    if contains_line(supabase, "universal_canon: true"):
+        errors.append("Supabase profile must not declare universal_canon: true")
+
+    for key in REQUIRED_GHOSTS:
+        if key not in ghost_text:
+            errors.append(f"ghost report missing required Ghost key: {key}")
+    return errors
+
+
 def main():
     zip_files = repository_zip_files()
     if zip_files:
@@ -46,13 +110,30 @@ def main():
             print(f"- {path}")
         return 1
 
+    tracked_zips = tracked_zip_files()
+    if tracked_zips:
+        print("repository hygiene failed: tracked zip files are not allowed:")
+        for path in tracked_zips:
+            print(f"- {path}")
+        return 1
+
     missing = [p for p in REQUIRED if not (DIST / p).exists()]
     if missing:
         print("missing required paths:")
-        for p in missing: print(f"- {p}")
+        for p in missing:
+            print(f"- {p}")
         return 1
-    print("validation implemented: expected generated project paths exist and repository zip hygiene passed")
+
+    blueprint_errors = validate_blueprint_outputs()
+    if blueprint_errors:
+        print("blueprint-derived validation failed:")
+        for error in blueprint_errors:
+            print(f"- {error}")
+        return 1
+
+    print("validation implemented: expected generated project paths, blueprint-derived outputs, and zip hygiene passed")
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

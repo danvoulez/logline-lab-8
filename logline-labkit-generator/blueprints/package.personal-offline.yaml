@@ -1,4 +1,33 @@
-package: personal-offline
-status: complete_lab_practice_pack
-profile: local-offline
-requires_network: false
+{
+  "source_kind": "pack_manifest_blueprint",
+  "pack_version": 1,
+  "pack": {
+    "id": "personal-offline",
+    "name": "Personal Offline",
+    "status": "private_local_practice",
+    "official": false,
+    "purpose": "A private/offline full LogLine Lab pack for longitudinal personal event capture, local Candidate queues, batch checkpointing, and future selective disclosure."
+  },
+  "authority": {
+    "canon_amendment": false,
+    "official_pack": false,
+    "local_practice": true
+  },
+  "practice": {
+    "act_centered": true,
+    "mostly_automatic_capture": true,
+    "local_first": true,
+    "queued_batches": true,
+    "passkey_checkpoints_future": true
+  },
+  "suggested_reports": ["daily-state", "ghost-review"],
+  "suggested_adapters": ["personal-adapters-unimplemented"],
+  "default_ghosts": [
+    "passkey-checkpointing-unimplemented",
+    "batch-signing-unimplemented",
+    "personal-adapters-unimplemented",
+    "selective-disclosure-unimplemented",
+    "evidence-registry-unimplemented",
+    "receipt-closure-unimplemented"
+  ]
+}

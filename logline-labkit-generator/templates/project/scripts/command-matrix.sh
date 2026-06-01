@@ -21,4 +21,4 @@ trap cleanup EXIT
   echo
   echo "## logline-lab chat"
   if $BIN chat; then echo "unexpected implemented"; else echo "ghost expected"; fi
-} | tee reports/COMMAND_MATRIX.md
+} | tee reports/COMMAND_MATRIX_RUN.md
