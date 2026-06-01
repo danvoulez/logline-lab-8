@@ -1,5 +1,7 @@
 use std::{env, fs, path::PathBuf, process};
 
+const VERSION: &str = include_str!("../../../VERSION");
+
 fn main() {
     let args = env::args().skip(1).collect::<Vec<_>>();
     let code = dispatch(&args);
@@ -9,16 +11,23 @@ fn main() {
 fn dispatch(args: &[String]) -> i32 {
     match args {
         [] => {
-            println!("logline-lab 0.1.0");
-            println!("partial: run --help for generated CLI commands");
+            print_help();
             0
         }
         [flag] if flag == "--version" || flag == "-V" => {
-            println!("logline-lab 0.1.0");
+            println!("logline-lab {}", VERSION.trim());
             0
         }
         [flag] if flag == "--help" || flag == "-h" => {
             print_help();
+            0
+        }
+        [cmd, flag] if flag == "--help" || flag == "-h" => {
+            print_command_help(cmd);
+            0
+        }
+        [scope, action, flag] if flag == "--help" || flag == "-h" => {
+            print_nested_command_help(scope, action);
             0
         }
         [cmd, rest @ ..] if cmd == "init" => match init_args(rest) {
@@ -72,14 +81,19 @@ fn dispatch(args: &[String]) -> i32 {
         [scope, rest @ ..] if scope == "report" => dispatch_report(rest),
         [cmd] if cmd == "lab" => {
             eprintln!("Ghost: interactive-lab-surface-unimplemented");
+            eprintln!("authority: no interactive surface is implemented by this CLI-first kit");
             2
         }
         [cmd] if cmd == "chat" => {
             eprintln!("Ghost: llm-translator-unimplemented");
+            eprintln!("authority: no LLM provider is configured or authoritative");
             2
         }
         [scope, action] if scope == "act" && action == "validate" => {
-            println!("partial: provide --file <path> to validate a JSON LogLine Act");
+            println!("usage: logline-lab act validate --file <path>");
+            println!(
+                "authority: validates local JSON Act shape only; no remote write and no receipt"
+            );
             0
         }
         [scope, action, flag, path]
@@ -315,7 +329,106 @@ fn home_from_args(args: &[String]) -> Result<PathBuf, String> {
     }
 }
 
+fn print_command_help(command: &str) {
+    match command {
+        "init" => {
+            println!("Usage: logline-lab init --home <path> [--pack <id>] [--profile <id>]");
+            println!("Initializes local workspace files only; no remote spine, receipt, or external service.");
+        }
+        "doctor" => {
+            println!("Usage: logline-lab doctor --home <path>");
+            println!("Checks local generated-project and Lab home structure; Ghosts may remain expected.");
+        }
+        "status" => {
+            println!("Usage: logline-lab status --home <path>");
+            println!("Reports local workspace state only; it is not an official spine or receipt.");
+        }
+        "lab" => {
+            println!("Usage: logline-lab lab");
+            println!("Ghost: interactive-lab-surface-unimplemented. The kit remains CLI-first.");
+        }
+        "chat" => {
+            println!("Usage: logline-lab chat");
+            println!("Ghost: llm-translator-unimplemented. No LLM is configured or authoritative.");
+        }
+        _ => print_help(),
+    }
+}
+
+fn print_nested_command_help(scope: &str, action: &str) {
+    match (scope, action) {
+        ("act", "validate") => {
+            println!("Usage: logline-lab act validate --file <path>");
+            println!("Validates JSON LogLine Act shape only; no remote write and no receipt.");
+        }
+        ("act", "emit") => {
+            println!("Usage: logline-lab act emit --file <path>");
+            println!("Preview-only command; no remote write and no receipt closure.");
+        }
+        ("candidate", "add") => {
+            println!("Usage: logline-lab candidate add --home <path> --file <path>");
+            println!("Captures a local Candidate only; it is not a ledger entry or official spine write.");
+        }
+        ("candidate", "list") => {
+            println!("Usage: logline-lab candidate list --home <path>");
+            println!("Lists local Candidates only.");
+        }
+        ("candidate", "get") => {
+            println!("Usage: logline-lab candidate get <candidate_id> --home <path>");
+            println!("Shows local Candidate content and metadata only.");
+        }
+        ("ghost", "list") => {
+            println!("Usage: logline-lab ghost list --home <path>");
+            println!("Lists unresolved local Ghosts; this is not evidence proof.");
+        }
+        ("report", "generate") => {
+            println!("Usage: logline-lab report generate daily-state --home <path>");
+            println!("Generates a local workspace projection only; it is not a receipt.");
+        }
+        _ => print_help(),
+    }
+}
+
 fn print_help() {
+    println!("logline-lab {}", VERSION.trim());
+    println!("CLI-first local LogLine Lab Kit.");
+    println!();
     println!("Usage: logline-lab <command>");
-    println!("Commands: init [--home <path>] [--pack <id>] [--profile <id>], doctor [--home <path>], status [--home <path>], candidate add --file <path> [--home <path>], candidate list [--home <path>], candidate get <candidate_id> [--home <path>], ghost list [--home <path>], report generate daily-state [--home <path>], act validate [--file <path>], act emit --file <path>, lab, chat");
+    println!();
+    println!("Local workspace commands:");
+    println!("  init --home <path> [--pack <id>] [--profile <id>]  Initialize a local Lab home");
+    println!(
+        "  doctor --home <path>                                Check local Lab home structure"
+    );
+    println!(
+        "  status --home <path>                                Show local Lab workspace status"
+    );
+    println!();
+    println!("Act commands:");
+    println!(
+        "  act validate --file <path>                          Validate JSON LogLine Act shape"
+    );
+    println!("  act emit --file <path>                              Preview only; no remote write or receipt");
+    println!();
+    println!("Candidate commands:");
+    println!(
+        "  candidate add --home <path> --file <path>           Capture a validated local Candidate"
+    );
+    println!("  candidate list --home <path>                        List local Candidates");
+    println!("  candidate get <candidate_id> --home <path>          Show one local Candidate");
+    println!();
+    println!("Ghost and report commands:");
+    println!("  ghost list --home <path>                            List unresolved local Ghosts");
+    println!("  report generate daily-state --home <path>           Write a local Daily State projection");
+    println!();
+    println!("Ghost commands:");
+    println!("  lab                                                 Ghost: interactive-lab-surface-unimplemented");
+    println!(
+        "  chat                                                Ghost: llm-translator-unimplemented"
+    );
+    println!();
+    println!("Authority boundaries:");
+    println!("  local-offline works without Supabase or external services.");
+    println!("  Local workspace state is not an official spine, not a receipt store, and not evidence proof.");
+    println!("  LLM/TUI/Supabase/receipts remain Ghosted unless explicitly implemented.");
 }

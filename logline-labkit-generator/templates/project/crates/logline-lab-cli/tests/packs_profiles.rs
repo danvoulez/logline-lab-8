@@ -44,8 +44,8 @@ fn init_with_santo_andre_local_offline_writes_manifest_selection() {
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(stdout.contains("pack: santo-andre"));
     assert!(stdout.contains("profile: local-offline"));
-    let manifest = fs::read_to_string(home.join(".logline-lab/lab.manifest.yaml"))
-        .expect("read manifest");
+    let manifest =
+        fs::read_to_string(home.join(".logline-lab/lab.manifest.yaml")).expect("read manifest");
     assert!(manifest.contains("selected:"));
     assert!(manifest.contains("  pack: santo-andre"));
     assert!(manifest.contains("  profile: local-offline"));
@@ -55,9 +55,7 @@ fn init_with_santo_andre_local_offline_writes_manifest_selection() {
 #[test]
 fn status_after_init_shows_pack_and_profile() {
     let home = temp_home("status");
-    assert!(init(&home, "santo-andre", "local-offline")
-        .status
-        .success());
+    assert!(init(&home, "santo-andre", "local-offline").status.success());
     let output = run_lab(&["status", "--home", home.to_str().unwrap()]);
     assert!(
         output.status.success(),
@@ -74,9 +72,7 @@ fn status_after_init_shows_pack_and_profile() {
 #[test]
 fn doctor_after_init_reports_known_pack_and_profile() {
     let home = temp_home("doctor");
-    assert!(init(&home, "santo-andre", "local-offline")
-        .status
-        .success());
+    assert!(init(&home, "santo-andre", "local-offline").status.success());
     let output = run_lab(&["doctor", "--home", home.to_str().unwrap()]);
     assert!(
         output.status.success(),
@@ -155,9 +151,7 @@ fn supabase_profile_initializes_but_reports_unconfigured_ghosts() {
 #[test]
 fn daily_state_report_includes_pack_profile_and_capabilities() {
     let home = temp_home("daily");
-    assert!(init(&home, "santo-andre", "local-offline")
-        .status
-        .success());
+    assert!(init(&home, "santo-andre", "local-offline").status.success());
     let output = run_lab(&[
         "report",
         "generate",
@@ -196,13 +190,14 @@ fn created_paths_do_not_use_forbidden_names() {
 #[test]
 fn doctor_fails_unknown_pack_in_manifest() {
     let home = temp_home("manifest-unknown-pack");
-    assert!(init(&home, "santo-andre", "local-offline")
-        .status
-        .success());
+    assert!(init(&home, "santo-andre", "local-offline").status.success());
     let manifest_path = home.join(".logline-lab/lab.manifest.yaml");
     let manifest = fs::read_to_string(&manifest_path).expect("read manifest");
-    fs::write(&manifest_path, manifest.replace("pack: santo-andre", "pack: mystery-pack"))
-        .expect("write manifest");
+    fs::write(
+        &manifest_path,
+        manifest.replace("pack: santo-andre", "pack: mystery-pack"),
+    )
+    .expect("write manifest");
     let output = run_lab(&["doctor", "--home", home.to_str().unwrap()]);
     assert!(!output.status.success());
     let stderr = String::from_utf8_lossy(&output.stderr);

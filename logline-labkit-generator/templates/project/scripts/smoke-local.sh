@@ -1,17 +1,86 @@
 #!/usr/bin/env sh
 set -eu
+
+ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 HOME_DIR="$(mktemp -d)"
-cleanup() { rm -rf "$HOME_DIR"; }
+OUT_DIR="$(mktemp -d)"
+cleanup() { rm -rf "$HOME_DIR" "$OUT_DIR"; }
 trap cleanup EXIT
-cargo test
-cargo run -p logline-lab-cli -- --version
-cargo run -p logline-lab-cli -- init --home "$HOME_DIR" --pack santo-andre --profile local-offline
-cargo run -p logline-lab-cli -- doctor --home "$HOME_DIR"
-cargo run -p logline-lab-cli -- status --home "$HOME_DIR"
-cargo run -p logline-lab-cli -- act validate --file examples/acts/minimal.act.json
-cargo run -p logline-lab-cli -- candidate add --home "$HOME_DIR" --file examples/acts/minimal.act.json
-cargo run -p logline-lab-cli -- candidate list --home "$HOME_DIR"
-cargo run -p logline-lab-cli -- ghost list --home "$HOME_DIR"
-cargo run -p logline-lab-cli -- report generate daily-state --home "$HOME_DIR"
+
+cd "$ROOT"
+
+cargo build -q -p logline-lab-cli
+BIN="$ROOT/target/debug/logline-lab"
+ACT="examples/acts/minimal.act.json"
+
+run_capture() {
+  name="$1"
+  shift
+  "$BIN" "$@" >"$OUT_DIR/$name.out" 2>"$OUT_DIR/$name.err"
+}
+
+assert_contains() {
+  file="$1"
+  needle="$2"
+  if ! grep -F "$needle" "$file" >/dev/null 2>&1; then
+    echo "smoke-local: expected '$needle' in $file" >&2
+    echo "--- $file ---" >&2
+    cat "$file" >&2
+    exit 1
+  fi
+}
+
+run_capture version --version
+assert_contains "$OUT_DIR/version.out" "logline-lab"
+assert_contains "$OUT_DIR/version.out" "0.1.0-alpha.0"
+
+run_capture help --help
+assert_contains "$OUT_DIR/help.out" "CLI-first local LogLine Lab Kit"
+assert_contains "$OUT_DIR/help.out" "candidate add"
+assert_contains "$OUT_DIR/help.out" "report generate daily-state"
+
+run_capture init init --home "$HOME_DIR" --pack santo-andre --profile local-offline
+assert_contains "$OUT_DIR/init.out" "initialized local LogLine Lab home"
+assert_contains "$OUT_DIR/init.out" "profile: local-offline"
+
+run_capture doctor doctor --home "$HOME_DIR"
+assert_contains "$OUT_DIR/doctor.out" "doctor: ok"
+assert_contains "$OUT_DIR/doctor.out" "remote spine: ghost remote-spine-unconfigured"
+
+run_capture validate act validate --file "$ACT"
+assert_contains "$OUT_DIR/validate.out" "valid LogLine Act"
+
+run_capture add candidate add --home "$HOME_DIR" --file "$ACT"
+assert_contains "$OUT_DIR/add.out" "candidate captured"
+assert_contains "$OUT_DIR/add.out" "not official spine"
+CANDIDATE_ID="$(awk '/^id: / { print $2; exit }' "$OUT_DIR/add.out")"
+if [ -z "$CANDIDATE_ID" ]; then
+  echo "smoke-local: missing candidate id" >&2
+  cat "$OUT_DIR/add.out" >&2
+  exit 1
+fi
+
+run_capture list candidate list --home "$HOME_DIR"
+assert_contains "$OUT_DIR/list.out" "candidates: 1"
+assert_contains "$OUT_DIR/list.out" "$CANDIDATE_ID"
+
+run_capture get candidate get "$CANDIDATE_ID" --home "$HOME_DIR"
+assert_contains "$OUT_DIR/get.out" "$CANDIDATE_ID"
+assert_contains "$OUT_DIR/get.out" "candidate:"
+
+run_capture ghosts ghost list --home "$HOME_DIR"
+assert_contains "$OUT_DIR/ghosts.out" "remote-spine-unconfigured"
+assert_contains "$OUT_DIR/ghosts.out" "authority: local workspace Ghost list only"
+
+run_capture report report generate daily-state --home "$HOME_DIR"
+assert_contains "$OUT_DIR/report.out" "daily-state report generated"
 test -f "$HOME_DIR/.logline-lab/reports/daily-state.md"
-cargo run -p logline-lab-cli -- status --home "$HOME_DIR"
+assert_contains "$HOME_DIR/.logline-lab/reports/daily-state.md" "# Daily Lab State"
+assert_contains "$HOME_DIR/.logline-lab/reports/daily-state.md" "Candidates: 1"
+
+run_capture status status --home "$HOME_DIR"
+assert_contains "$OUT_DIR/status.out" "status: local LogLine Lab workspace"
+assert_contains "$OUT_DIR/status.out" "candidate_count: 1"
+assert_contains "$OUT_DIR/status.out" "reports_available: 1"
+
+echo "smoke-local: ok"
