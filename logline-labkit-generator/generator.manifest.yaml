@@ -1,0 +1,23 @@
+name: logline-labkit-generator
+version: 0.1.0
+source_corpus:
+  path: corpus/v1.1
+  original_zip_sha256: 155413651ff1614152970de6c806adf8b4679c0d002a3ed41f4e427bd208a9bb
+approval:
+  human: Dan Amarilho
+  note: corpus/APPROVAL_NOTE.md
+outputs:
+  project: ../dist/logline-lab-kit
+authority:
+  canon_slots:
+    - who
+    - did
+    - this
+    - when
+    - confirmed_by
+    - if_ok
+    - if_doubt
+    - if_not
+    - status
+  no_canon_amendment: true
+  no_vendor_edits: true

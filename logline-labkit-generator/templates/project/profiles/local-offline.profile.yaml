@@ -1,0 +1,5 @@
+profile: local-offline
+capabilities:
+  - queued-batches
+  - passkey-signed-checkpoints
+network_required: false

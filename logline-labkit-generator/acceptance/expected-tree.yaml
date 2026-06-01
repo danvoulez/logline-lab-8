@@ -1,0 +1,9 @@
+required_paths:
+  - README.md
+  - Cargo.toml
+  - Cargo.lock
+  - crates/logline-act
+  - crates/logline-lab-core
+  - crates/logline-lab-cli
+  - docs/00-overview.md
+  - reports/GHOSTS.md

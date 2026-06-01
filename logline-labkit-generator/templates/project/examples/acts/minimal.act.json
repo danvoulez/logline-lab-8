@@ -1,0 +1,11 @@
+{
+  "who": "operator",
+  "did": "validated",
+  "this": "minimal generated example",
+  "when": "2026-06-01T00:00:00Z",
+  "confirmed_by": "examples/acts/minimal.act.json",
+  "if_ok": "continue",
+  "if_doubt": "review",
+  "if_not": "reject",
+  "status": "candidate"
+}

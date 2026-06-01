@@ -1,0 +1,11 @@
+packs:
+  santo-andre:
+    status: recommended_reference_practice
+    official: false
+profiles:
+  supabase:
+    scope: v0_santo_andre_profile_online_spine
+    universal: false
+  local-offline:
+    scope: personal_offline_lab
+    notes: queued batches and passkey-signed checkpoints are profile practice

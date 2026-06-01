@@ -1,0 +1,10 @@
+binary: logline-lab
+commands:
+  - logline-lab --version
+  - logline-lab init
+  - logline-lab doctor
+  - logline-lab status
+  - logline-lab act validate
+  - logline-lab act emit --file <path>
+  - logline-lab lab
+  - logline-lab chat

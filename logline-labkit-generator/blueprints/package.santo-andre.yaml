@@ -1,0 +1,4 @@
+package: santo-andre
+status: recommended_reference_practice
+is_official_pack: false
+profile: supabase
