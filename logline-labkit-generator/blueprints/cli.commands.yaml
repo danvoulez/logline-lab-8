@@ -1,10 +1,111 @@
-binary: logline-lab
-commands:
-  - logline-lab --version
-  - logline-lab init
-  - logline-lab doctor
-  - logline-lab status
-  - logline-lab act validate
-  - logline-lab act emit --file <path>
-  - logline-lab lab
-  - logline-lab chat
+{
+  "binary": "logline-lab",
+  "commands": [
+    {
+      "command": "logline-lab --version",
+      "status": "implemented",
+      "scope": "local cli metadata",
+      "authority_limit": "prints generated kit version only",
+      "ghosts_or_notes": "No authority change."
+    },
+    {
+      "command": "logline-lab --help",
+      "status": "implemented",
+      "scope": "local cli help",
+      "authority_limit": "describes local commands and boundaries only",
+      "ghosts_or_notes": "No authority change."
+    },
+    {
+      "command": "logline-lab init",
+      "status": "implemented",
+      "scope": "local Lab home",
+      "authority_limit": "creates local workspace and records selected pack/profile",
+      "ghosts_or_notes": "Defaults remain local and do not create a remote spine."
+    },
+    {
+      "command": "logline-lab doctor",
+      "status": "implemented",
+      "scope": "local Lab home",
+      "authority_limit": "checks local generated/workspace paths and declared capability state",
+      "ghosts_or_notes": "Remote capability Ghosts remain non-fatal."
+    },
+    {
+      "command": "logline-lab status",
+      "status": "implemented",
+      "scope": "local Lab home projection",
+      "authority_limit": "reports local workspace state only",
+      "ghosts_or_notes": "Projection reads; runtime observes."
+    },
+    {
+      "command": "logline-lab act validate",
+      "status": "implemented",
+      "scope": "Act JSON validation",
+      "authority_limit": "validates canonical nine-slot JSON Acts only",
+      "ghosts_or_notes": "yaml-act-parser-unimplemented"
+    },
+    {
+      "command": "logline-lab act emit",
+      "status": "partial / preview-only",
+      "scope": "Act preview",
+      "authority_limit": "validates and previews only; no remote write or receipt closure",
+      "ghosts_or_notes": "remote-spine-unconfigured; receipt-closure-unimplemented"
+    },
+    {
+      "command": "logline-lab candidate add",
+      "status": "implemented",
+      "scope": "local Candidate capture",
+      "authority_limit": "captures validated Act input as local Candidate only",
+      "ghosts_or_notes": "LLM may suggest Candidates only."
+    },
+    {
+      "command": "logline-lab candidate list",
+      "status": "implemented",
+      "scope": "local Candidate queue",
+      "authority_limit": "lists local Candidate records only",
+      "ghosts_or_notes": "No remote sync."
+    },
+    {
+      "command": "logline-lab candidate get",
+      "status": "implemented",
+      "scope": "local Candidate queue",
+      "authority_limit": "prints local Candidate metadata and captured content only",
+      "ghosts_or_notes": "No receipt closure."
+    },
+    {
+      "command": "logline-lab ghost list",
+      "status": "implemented",
+      "scope": "local Ghost report",
+      "authority_limit": "lists local Ghost keys only",
+      "ghosts_or_notes": "Ghosts are not fatal by default."
+    },
+    {
+      "command": "logline-lab report generate daily-state",
+      "status": "implemented",
+      "scope": "local projection/report",
+      "authority_limit": "writes local workspace projection only",
+      "ghosts_or_notes": "No evidence proof, receipt, or remote sync."
+    },
+    {
+      "command": "logline-lab lab",
+      "status": "ghost",
+      "scope": "interactive Lab surface",
+      "authority_limit": "not implemented",
+      "ghosts_or_notes": "interactive-lab-surface-unimplemented"
+    },
+    {
+      "command": "logline-lab chat",
+      "status": "ghost",
+      "scope": "LLM translator surface",
+      "authority_limit": "not implemented; LLM never has authority",
+      "ghosts_or_notes": "llm-translator-unimplemented"
+    }
+  ],
+  "required_ghosts": [
+    "remote-spine-unconfigured",
+    "evidence-registry-unimplemented",
+    "receipt-closure-unimplemented",
+    "interactive-lab-surface-unimplemented",
+    "llm-translator-unimplemented",
+    "yaml-act-parser-unimplemented"
+  ]
+}

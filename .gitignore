@@ -9,3 +9,7 @@ dist/
 logline-labkit-generator/corpus/*.zip
 *.zip
 codex-input/
+
+# Python cache
+__pycache__/
+*.py[cod]

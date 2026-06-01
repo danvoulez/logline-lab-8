@@ -1,0 +1,41 @@
+{
+  "source_kind": "profile_manifest_blueprint",
+  "profile_version": 1,
+  "profile": {
+    "id": "supabase",
+    "name": "Supabase Online Spine",
+    "kind": "online_spine_profile"
+  },
+  "authority": {
+    "official_spine_declared": true,
+    "universal_canon": false,
+    "requires_configuration": true
+  },
+  "capabilities": {
+    "remote_spine": "declared_not_implemented",
+    "act_validation": true,
+    "candidate_capture": true,
+    "local_lab_home": true,
+    "supabase_ingest": "unimplemented",
+    "supabase_env_verification": "unverified",
+    "evidence_registry": "unimplemented",
+    "receipt_closure": "unimplemented"
+  },
+  "required_env": [
+    "SUPABASE_URL",
+    "SUPABASE_ANON_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY"
+  ],
+  "unavailable_capabilities": [
+    "remote_spine",
+    "supabase_ingest",
+    "supabase_env_verification",
+    "evidence_registry",
+    "receipt_closure"
+  ],
+  "default_ghosts": [
+    "supabase-ingest-unimplemented",
+    "supabase-env-unverified",
+    "remote-spine-unconfigured"
+  ]
+}
