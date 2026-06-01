@@ -1,9 +1,62 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://logline.local/schemas/pack-manifest.schema.json",
   "title": "Pack Manifest",
+  "description": "Blueprint-rendered local practice pack manifest. Packs are not canon amendments and Santo André/Personal Offline are not official packs in this release.",
   "type": "object",
   "required": [
+    "pack_version",
     "pack",
-    "status"
-  ]
+    "authority",
+    "practice",
+    "default_ghosts"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "source_kind": {"type": "string"},
+    "pack_version": {"const": 1},
+    "pack": {
+      "type": "object",
+      "required": ["id", "name", "status", "official"],
+      "additionalProperties": true,
+      "properties": {
+        "id": {"enum": ["santo-andre", "personal-offline"]},
+        "name": {"type": "string"},
+        "status": {"type": "string"},
+        "official": {"const": false},
+        "purpose": {"type": "string"},
+        "steward": {"type": "string"}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "required": ["canon_amendment", "official_pack", "local_practice"],
+      "additionalProperties": true,
+      "properties": {
+        "canon_amendment": {"const": false},
+        "official_pack": {"const": false},
+        "local_practice": {"type": "boolean"}
+      }
+    },
+    "practice": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "suggested_reports": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "suggested_adapters": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "suggested_benches": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "default_ghosts": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  }
 }

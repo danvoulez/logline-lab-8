@@ -1,6 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://logline.local/schemas/logline-act.schema.json",
   "title": "LogLine Act",
+  "description": "Canonical nine-slot JSON Act shape used by the current Rust validator. Top-level metadata/projection fields are not Act slots.",
   "type": "object",
   "required": [
     "who",
@@ -13,5 +15,16 @@
     "if_not",
     "status"
   ],
-  "additionalProperties": true
+  "additionalProperties": false,
+  "properties": {
+    "who": {},
+    "did": {},
+    "this": {},
+    "when": {},
+    "confirmed_by": {},
+    "if_ok": {},
+    "if_doubt": {},
+    "if_not": {},
+    "status": {}
+  }
 }

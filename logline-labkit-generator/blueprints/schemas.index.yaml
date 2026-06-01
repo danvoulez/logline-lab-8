@@ -1,5 +1,7 @@
 schemas:
   - logline-act.schema.json
   - lab-manifest.schema.json
+  - candidate-metadata.schema.json
+  - candidate-index.schema.json
   - pack-manifest.schema.json
   - profile.schema.json

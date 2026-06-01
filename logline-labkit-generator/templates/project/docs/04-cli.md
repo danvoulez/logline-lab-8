@@ -68,6 +68,8 @@ logline-lab report generate daily-state --home .
 
 `logline-lab act validate --file <path>` validates a JSON LogLine Act against the nine-slot shape. Validation is local shape validation only.
 
+The Rust validator is authoritative for valid/invalid Act shape in the CLI. The JSON Schemas in `schemas/` document generated file shapes and interoperability contracts; the CLI does not replace the Rust validator with runtime JSON Schema validation in this release. `examples/fixtures.index.md` lists valid and invalid fixtures with expected results.
+
 `logline-lab act emit --file <path>` validates the Act and returns a preview-only message. It does not write remote state and does not close a receipt.
 
 ## Ghost commands

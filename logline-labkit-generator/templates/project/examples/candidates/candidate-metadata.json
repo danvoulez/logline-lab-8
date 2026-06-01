@@ -1,0 +1,9 @@
+{
+  "candidate_id": "cand_1780272000000_5d41402abc4b",
+  "captured_at": "1780272000000",
+  "source_file": "examples/acts/minimal.act.json",
+  "status": "candidate",
+  "authority": "local_capture_only_not_official_spine",
+  "validated_act_shape": true,
+  "input_hash": "5d41402abc4b"
+}

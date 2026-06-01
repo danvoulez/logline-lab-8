@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import json
 import subprocess
 import sys
 
@@ -46,16 +47,16 @@ REQUIRED = [
     "README.md", "VERSION", "LICENSE", "Cargo.toml", "Cargo.lock", "rust-toolchain.toml", "install.sh", ".env.example",
     "crates/logline-act/Cargo.toml", "crates/logline-lab-core/Cargo.toml", "crates/logline-lab-core/src/lab_home.rs", "crates/logline-lab-core/src/candidates.rs", "crates/logline-lab-core/src/catalog.rs", "crates/logline-lab-core/src/ghosts.rs", "crates/logline-lab-core/src/reports.rs", "crates/logline-lab-cli/Cargo.toml",
     "docs/00-overview.md", "docs/01-logline-act.md", "docs/02-product.md", "docs/03-packs-and-profiles.md",
-    "docs/04-cli.md", "docs/05-install.md", "docs/06-recovery.md", "docs/07-interactive-ux.md", "docs/08-llm-boundary.md", "docs/release/RELEASE_CHECKLIST.md",
+    "docs/04-cli.md", "docs/05-install.md", "docs/06-recovery.md", "docs/07-interactive-ux.md", "docs/08-llm-boundary.md", "docs/09-schemas-and-fixtures.md", "docs/release/RELEASE_CHECKLIST.md",
     ".github/pull_request_template.md", "docs/contributing/PR_PRACTICES.md", "docs/contributing/NO_DRIFT_REVIEW.md",
     "docs/contributing/GENERATOR_WORKFLOW.md", "docs/contributing/AUTHORITY_BOUNDARIES.md",
-    "schemas/logline-act.schema.json", "schemas/lab-manifest.schema.json", "schemas/pack-manifest.schema.json", "schemas/profile.schema.json",
+    "schemas/logline-act.schema.json", "schemas/lab-manifest.schema.json", "schemas/candidate-metadata.schema.json", "schemas/candidate-index.schema.json", "schemas/pack-manifest.schema.json", "schemas/profile.schema.json",
     "manifests/lab.manifest.example.yaml", "manifests/santo-andre.manifest.example.yaml", "manifests/personal-offline.manifest.example.yaml",
     "profiles/supabase.profile.yaml", "profiles/local-offline.profile.yaml",
     "packages/santo-andre/package.yaml", "packages/personal-offline/package.yaml",
-    "examples/acts/minimal.act.json", "examples/candidates/ugly-candidate.json",
+    "examples/acts/minimal.act.json", "examples/candidates/ugly-candidate.json", "examples/candidates/candidate-metadata.json", "examples/candidates/candidate-index.json", "examples/fixtures.index.md",
     "examples/invalid/missing-confirmed-by.json", "examples/invalid/extra-selected-branch.json", "examples/invalid/extra-runtime-envelope.json",
-    "examples/invalid/malformed.json", "examples/invalid/extra-top-level-field.json",
+    "examples/invalid/malformed.json", "examples/invalid/extra-top-level-field.json", "examples/invalid/candidate-index-inconsistent.json",
     "crates/logline-act/tests/act_validation.rs", "crates/logline-lab-cli/tests/cli_act.rs", "crates/logline-lab-cli/tests/lab_home.rs", "crates/logline-lab-cli/tests/candidates.rs", "crates/logline-lab-cli/tests/candidate_index.rs", "crates/logline-lab-cli/tests/reports.rs", "crates/logline-lab-cli/tests/packs_profiles.rs", "crates/logline-lab-cli/tests/help_version.rs", "scripts/smoke-local.sh", "scripts/scan-forbidden-markers.sh", "scripts/command-matrix.sh",
     "reports/GHOSTS.md", "reports/COMMAND_MATRIX.md", "reports/FORBIDDEN_MARKER_SCAN.md",
 ]
@@ -64,6 +65,69 @@ REQUIRED = [
 def contains_line(text, needle):
     return any(line.strip() == needle for line in text.splitlines())
 
+
+def validate_schema_files():
+    errors = []
+    required_schema_paths = [
+        "schemas/logline-act.schema.json",
+        "schemas/lab-manifest.schema.json",
+        "schemas/candidate-metadata.schema.json",
+        "schemas/candidate-index.schema.json",
+        "schemas/pack-manifest.schema.json",
+        "schemas/profile.schema.json",
+    ]
+    for rel in required_schema_paths:
+        if not (DIST / rel).is_file():
+            errors.append(f"missing schema file: {rel}")
+
+    act_schema_path = DIST / "schemas/logline-act.schema.json"
+    if act_schema_path.is_file():
+        act_schema = json.loads(act_schema_path.read_text(encoding="utf-8"))
+        canonical_slots = [
+            "who",
+            "did",
+            "this",
+            "when",
+            "confirmed_by",
+            "if_ok",
+            "if_doubt",
+            "if_not",
+            "status",
+        ]
+        if act_schema.get("required") != canonical_slots:
+            errors.append("logline-act schema required slots do not match canonical nine slots")
+        if act_schema.get("additionalProperties") is not False:
+            errors.append("logline-act schema must reject additional top-level properties")
+        text = act_schema_path.read_text(encoding="utf-8")
+        for forbidden in [
+            "selected_branch",
+            "runtime_envelope",
+            "content_hash",
+            "runtime_id",
+            "type_hint",
+        ]:
+            if forbidden in text:
+                errors.append(
+                    f"logline-act schema must not include reserved metadata slot: {forbidden}"
+                )
+
+    fixture_index = DIST / "examples/fixtures.index.md"
+    if fixture_index.is_file():
+        index_text = fixture_index.read_text(encoding="utf-8")
+        for fixture in [
+            "examples/acts/minimal.act.json",
+            "examples/candidates/ugly-candidate.json",
+            "examples/invalid/missing-confirmed-by.json",
+            "examples/invalid/extra-selected-branch.json",
+            "examples/invalid/extra-runtime-envelope.json",
+            "examples/invalid/extra-top-level-field.json",
+            "examples/invalid/malformed.json",
+            "examples/candidates/candidate-metadata.json",
+            "examples/candidates/candidate-index.json",
+        ]:
+            if fixture not in index_text:
+                errors.append(f"fixture index missing fixture: {fixture}")
+    return errors
 
 def validate_blueprint_outputs():
     errors = []
@@ -122,6 +186,13 @@ def main():
         print("missing required paths:")
         for p in missing:
             print(f"- {p}")
+        return 1
+
+    schema_errors = validate_schema_files()
+    if schema_errors:
+        print("schema/fixture validation failed:")
+        for error in schema_errors:
+            print(f"- {error}")
         return 1
 
     blueprint_errors = validate_blueprint_outputs()

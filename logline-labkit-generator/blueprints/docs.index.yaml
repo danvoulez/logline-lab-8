@@ -8,3 +8,4 @@ docs:
   - 06-recovery.md
   - 07-interactive-ux.md
   - 08-llm-boundary.md
+  - 09-schemas-and-fixtures.md

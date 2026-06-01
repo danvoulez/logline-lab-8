@@ -1,0 +1,8 @@
+{
+  "index_version": 1,
+  "authority": "local_candidate_queue_index_not_official_spine",
+  "updated_at": "1780272000000",
+  "candidates": [
+    {"candidate_id": "cand_1780272000000_5d41402abc4b", "path": "../candidate.json", "metadata_path": "cand_1780272000000_5d41402abc4b/metadata.json", "captured_at": "1780272000000", "status": "candidate"}
+  ]
+}

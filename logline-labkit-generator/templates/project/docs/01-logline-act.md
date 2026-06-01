@@ -10,6 +10,8 @@ Top-level fields outside the nine slots are invalid in the canonical Act validat
 
 Current parser support is JSON. YAML parsing remains a Ghost until implemented by a later scoped change.
 
+See `docs/09-schemas-and-fixtures.md` for the generated Act schema, fixture index, and the boundary between the Rust validator and documentation/interoperability schemas.
+
 
 ## Candidate capture boundary
 
