@@ -7,3 +7,5 @@ dist/
 
 # Local binary corpus inputs
 logline-labkit-generator/corpus/*.zip
+*.zip
+codex-input/

@@ -2,8 +2,23 @@
 from pathlib import Path
 import sys
 
+
 ROOT = Path(__file__).resolve().parents[2]
 DIST = ROOT / "dist" / "logline-lab-kit"
+
+IGNORED_HYGIENE_DIRS = {".git", "codex-input", "dist", "target"}
+
+
+def repository_zip_files():
+    zip_files = []
+    for path in ROOT.rglob("*.zip"):
+        relative = path.relative_to(ROOT)
+        if any(part in IGNORED_HYGIENE_DIRS for part in relative.parts):
+            continue
+        zip_files.append(relative)
+    return sorted(zip_files)
+
+
 REQUIRED = [
     "README.md", "VERSION", "LICENSE", "Cargo.toml", "Cargo.lock", "rust-toolchain.toml", "install.sh", ".env.example",
     "crates/logline-act/Cargo.toml", "crates/logline-lab-core/Cargo.toml", "crates/logline-lab-core/src/lab_home.rs", "crates/logline-lab-core/src/candidates.rs", "crates/logline-lab-core/src/catalog.rs", "crates/logline-lab-core/src/ghosts.rs", "crates/logline-lab-core/src/reports.rs", "crates/logline-lab-cli/Cargo.toml",
@@ -22,13 +37,21 @@ REQUIRED = [
     "reports/GHOSTS.md", "reports/COMMAND_MATRIX.md", "reports/FORBIDDEN_MARKER_SCAN.md",
 ]
 
+
 def main():
+    zip_files = repository_zip_files()
+    if zip_files:
+        print("repository hygiene failed: zip files are not allowed in source-controlled areas:")
+        for path in zip_files:
+            print(f"- {path}")
+        return 1
+
     missing = [p for p in REQUIRED if not (DIST / p).exists()]
     if missing:
         print("missing required paths:")
         for p in missing: print(f"- {p}")
         return 1
-    print("validation implemented: expected generated project paths exist")
+    print("validation implemented: expected generated project paths exist and repository zip hygiene passed")
     return 0
 
 if __name__ == "__main__":
