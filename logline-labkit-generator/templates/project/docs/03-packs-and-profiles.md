@@ -1,3 +1,38 @@
 # Packs and Profiles
 
-Canon loads, pack interprets, profile provides capabilities, Lab runs, projection reads, runtime observes or executes. Santo André is a recommended reference practice, not official canon.
+Canon loads. Pack interprets. Profile provides capabilities. Lab runs. Projection reads. Runtime observes or executes. LLMs suggest Candidates only.
+
+## Definitions
+
+- **Canon** is the small stable LogLine foundation and Act shape.
+- **Pack** is local/domain practice and interpretation. A pack does not amend canon.
+- **Profile** is a capability/runtime/storage/environment declaration. A profile does not prove that external capabilities are configured or implemented.
+- **Lab** is a concrete initialized workspace using canon plus a selected pack and selected profile.
+
+## Initial local catalog
+
+This generated kit has a small built-in catalog that mirrors the YAML manifests in `packages/` and `profiles/`.
+
+### Packs
+
+- `santo-andre`: Dan's recommended/reference practice pack for experiments, product/runtime practice, and local control-plane oriented work. Santo André is **not official** and does not amend canon.
+- `personal-offline`: a private/offline full LogLine Lab pack for longitudinal personal event capture, local Candidate queues, future batch checkpointing, and future selective disclosure. Passkeys, batch signing, personal adapters, and selective disclosure remain Ghosts.
+
+### Profiles
+
+- `local-offline`: safe local workspace profile. It declares local home, Act validation, Candidate capture, Ghost listing, and Daily State report as available. Remote spine, evidence registry, receipt closure, LLM translator, and interactive lab surface remain unavailable/Ghost.
+- `supabase`: online spine profile declaration. It declares Supabase-related capability names but does not run Supabase ingest, migrations, environment verification, receipt closure, or evidence registry in this PR state. Missing Supabase environment is reported as Ghost/unverified, not as universal canon failure.
+
+## Init selection
+
+Initialize with explicit pack/profile selection:
+
+```sh
+logline-lab init --home . --pack santo-andre --profile local-offline
+logline-lab init --home . --pack personal-offline --profile local-offline
+logline-lab init --home . --pack santo-andre --profile supabase
+```
+
+If omitted, init defaults to `--pack santo-andre --profile local-offline` because that is the safe local reference practice for this generated kit.
+
+The selection is materialized in `.logline-lab/lab.manifest.yaml` under `selected:`. Selection means local Lab practice only. It does not make a pack canon, does not make a profile universal, and does not prove external capability.
