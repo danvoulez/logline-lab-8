@@ -33,7 +33,7 @@
       "command": "logline-lab status",
       "status": "implemented",
       "scope": "local Lab home projection",
-      "authority_limit": "reports local workspace state only",
+      "authority_limit": "reports local workspace state and local Candidate index state only",
       "ghosts_or_notes": "Projection reads; runtime observes."
     },
     {
@@ -54,14 +54,14 @@
       "command": "logline-lab candidate add",
       "status": "implemented",
       "scope": "local Candidate capture",
-      "authority_limit": "captures validated Act input as local Candidate only",
+      "authority_limit": "captures validated Act input as local Candidate only and updates local operational index metadata",
       "ghosts_or_notes": "LLM may suggest Candidates only."
     },
     {
       "command": "logline-lab candidate list",
       "status": "implemented",
       "scope": "local Candidate queue",
-      "authority_limit": "lists local Candidate records only",
+      "authority_limit": "lists local Candidate records using the local Candidate index when available",
       "ghosts_or_notes": "No remote sync."
     },
     {
@@ -70,6 +70,13 @@
       "scope": "local Candidate queue",
       "authority_limit": "prints local Candidate metadata and captured content only",
       "ghosts_or_notes": "No receipt closure."
+    },
+    {
+      "command": "logline-lab candidate index rebuild",
+      "status": "implemented",
+      "scope": "local Candidate queue metadata",
+      "authority_limit": "rebuilds local operational index metadata from local Candidate directories only",
+      "ghosts_or_notes": "No remote sync; not a receipt."
     },
     {
       "command": "logline-lab ghost list",
@@ -82,7 +89,7 @@
       "command": "logline-lab report generate daily-state",
       "status": "implemented",
       "scope": "local projection/report",
-      "authority_limit": "writes local workspace projection only",
+      "authority_limit": "writes local workspace projection with Candidate Index state only",
       "ghosts_or_notes": "No evidence proof, receipt, or remote sync."
     },
     {

@@ -29,6 +29,7 @@ required_paths:
   - crates/logline-lab-cli/tests/cli_act.rs
   - crates/logline-lab-cli/tests/lab_home.rs
   - crates/logline-lab-cli/tests/candidates.rs
+  - crates/logline-lab-cli/tests/candidate_index.rs
   - crates/logline-lab-cli/tests/reports.rs
   - crates/logline-lab-cli/tests/packs_profiles.rs
   - crates/logline-lab-cli/tests/help_version.rs

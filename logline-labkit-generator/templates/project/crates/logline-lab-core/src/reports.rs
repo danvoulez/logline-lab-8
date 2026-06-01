@@ -18,6 +18,7 @@ pub struct DailyStateReport {
     pub home: PathBuf,
     pub path: PathBuf,
     pub candidate_count: usize,
+    pub candidate_index_state: crate::candidates::CandidateIndexState,
     pub ghost_count: usize,
 }
 
@@ -75,7 +76,12 @@ impl LabHome {
         let candidate_list = self.list_candidates()?;
         let path = self.daily_state_report_path();
         fs::create_dir_all(self.reports_dir()).map_err(|err| ReportError::Io(err.to_string()))?;
-        let body = render_daily_state_report(self, &ghost_list, &candidate_list.records);
+        let body = render_daily_state_report(
+            self,
+            &ghost_list,
+            &candidate_list.records,
+            candidate_list.index_status,
+        );
         fs::write(&path, body).map_err(|err| {
             ReportError::Io(format!(
                 "unable to write daily-state report {}: {err}",
@@ -86,6 +92,7 @@ impl LabHome {
             home: self.home().to_path_buf(),
             path,
             candidate_count: candidate_list.records.len(),
+            candidate_index_state: candidate_list.index_status,
             ghost_count: ghost_list.ghosts.len(),
         })
     }
@@ -97,6 +104,10 @@ impl DailyStateReport {
             "daily-state report generated".to_string(),
             format!("path: {}", self.path.display()),
             format!("candidate_count: {}", self.candidate_count),
+            format!(
+                "candidate_index: {}",
+                self.candidate_index_state.as_cli_status()
+            ),
             format!("ghost_count: {}", self.ghost_count),
             "authority: local workspace projection only; not receipt; not evidence; not remote sync".to_string(),
         ]
@@ -108,6 +119,7 @@ fn render_daily_state_report(
     lab_home: &LabHome,
     ghost_list: &GhostList,
     candidates: &[crate::candidates::CandidateMetadata],
+    candidate_index_state: crate::candidates::CandidateIndexState,
 ) -> String {
     let selected = lab_home.selected_pack_profile();
     let pack_id = selected
@@ -128,8 +140,7 @@ fn render_daily_state_report(
         "## Authority".to_string(),
         String::new(),
         "This report is a local workspace projection.".to_string(),
-        "It is not official spine truth, not evidence, not a receipt, and not remote sync."
-            .to_string(),
+        "It is not official spine, not evidence, not a receipt, and not remote sync.".to_string(),
         String::new(),
         "## Pack/Profile".to_string(),
         String::new(),
@@ -151,6 +162,10 @@ fn render_daily_state_report(
         "## Counts".to_string(),
         String::new(),
         format!("- Candidates: {}", candidates.len()),
+        format!(
+            "- Candidate index: {}",
+            candidate_index_state.as_cli_status()
+        ),
         format!("- Ghosts: {}", ghost_list.ghosts.len()),
         String::new(),
         "## Ghosts".to_string(),
@@ -164,6 +179,12 @@ fn render_daily_state_report(
         }
     }
     lines.extend([
+        String::new(),
+        "## Candidate Index".to_string(),
+        String::new(),
+        format!("- State: {}", candidate_index_state.as_cli_status()),
+        format!("- Candidates indexed: {}", candidates.len()),
+        "- Authority: local operational index only; not official spine".to_string(),
         String::new(),
         "## Candidate Queue".to_string(),
         String::new(),

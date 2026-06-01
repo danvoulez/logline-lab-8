@@ -19,11 +19,11 @@ logline-lab doctor --home .
 logline-lab status --home .
 ```
 
-`logline-lab init [--home <path>] [--pack <id>] [--profile <id>]` validates the selected pack/profile against the initial local catalog, creates `.logline-lab/` with an editable `lab.manifest.yaml`, `STATUS.md`, `GHOSTS.md`, and local operational directories for candidates, reports, ghosts, profiles, and packs. Defaults are `--pack santo-andre --profile local-offline`. Init is idempotent and does not overwrite existing manifest/status/ghost files.
+`logline-lab init [--home <path>] [--pack <id>] [--profile <id>]` validates the selected pack/profile against the initial local catalog, creates `.logline-lab/` with an editable `lab.manifest.yaml`, `STATUS.md`, `GHOSTS.md`, and local operational directories for candidates, reports, ghosts, profiles, and packs. It also creates an empty `.logline-lab/candidates/index.json` local Candidate index. Defaults are `--pack santo-andre --profile local-offline`. Init is idempotent and does not overwrite existing manifest/status/ghost files.
 
-`logline-lab doctor [--home <path>]` checks the local home structure, validates selected pack/profile ids from the manifest when present, verifies `.logline-lab/candidates/` exists, and checks required generated project docs, examples, and schemas. An empty local candidate queue is healthy. Supabase profile declarations are reported as Ghost/unconfigured rather than requiring env vars in this PR state. Doctor returns non-zero when required local structure is missing or a selected pack/profile id is unknown.
+`logline-lab doctor [--home <path>]` checks the local home structure, validates selected pack/profile ids from the manifest when present, verifies `.logline-lab/candidates/` exists, checks the local Candidate index is parseable and consistent, and checks required generated project docs, examples, and schemas. An empty local candidate queue is healthy. Supabase profile declarations are reported as Ghost/unconfigured rather than requiring env vars in this PR state. Doctor returns non-zero when required local structure is missing, a selected pack/profile id is unknown, or the candidate index is malformed/inconsistent. Missing candidate index files are reported as warnings with the rebuild command.
 
-`logline-lab status [--home <path>]` reads the local workspace state, shows selected pack/profile, includes `candidate_count`, reports `local_candidate_queue: available` when initialized, lists Ghost records, includes report count/latest report when present, and reports profile capability state plus remote spine, evidence registry, receipt closure, interactive UX, YAML parsing, and LLM translator surfaces as ghosted or unimplemented.
+`logline-lab status [--home <path>]` reads the local workspace state, shows selected pack/profile, includes `candidate_count` and `candidate_index`, reports `local_candidate_queue: available` when initialized, lists Ghost records, includes report count/latest report when present, and reports profile capability state plus remote spine, evidence registry, receipt closure, interactive UX, YAML parsing, and LLM translator surfaces as ghosted or unimplemented.
 
 ## Candidate commands
 
@@ -33,15 +33,18 @@ Candidate capture is local operational capture for the first capture loop:
 logline-lab candidate add --home . --file examples/acts/minimal.act.json
 logline-lab candidate list --home .
 logline-lab candidate get <candidate_id> --home .
+logline-lab candidate index rebuild --home .
 ```
 
-`logline-lab candidate add --file <path> [--home <path>]` requires an initialized Lab home and validates the input file with the canonical nine-slot JSON Act validator. Invalid Acts are rejected before any Candidate record is created. Valid input is copied unchanged into `.logline-lab/candidates/<candidate_id>/candidate.json`, with lightweight metadata in `metadata.json`.
+`logline-lab candidate add --file <path> [--home <path>]` requires an initialized Lab home and validates the input file with the canonical nine-slot JSON Act validator. Invalid Acts are rejected before any Candidate record is created. Valid input is copied unchanged into `.logline-lab/candidates/<candidate_id>/candidate.json`, with lightweight metadata in `metadata.json`, then `.logline-lab/candidates/index.json` is updated atomically as a local operational index.
 
-`logline-lab candidate list [--home <path>]` reads only `.logline-lab/candidates/` and reports count, ids, timestamps, and Candidate status where metadata is available.
+`logline-lab candidate list [--home <path>]` reads `.logline-lab/candidates/index.json` when available and valid, reports `index: available`, and still verifies indexed candidate files exist. If the index is missing, list rebuilds the local Candidate index from candidate directories and reports `index: rebuilt`. If the index is malformed, list returns non-zero and reports the malformed index instead of pretending the queue is healthy.
 
-`logline-lab candidate get <candidate_id> [--home <path>]` prints metadata and the captured Candidate content. Missing Candidates return non-zero with `candidate not found: <candidate_id>`.
+`logline-lab candidate get <candidate_id> [--home <path>]` prints metadata and the captured Candidate content. It may use the local Candidate index to locate files, but still verifies the candidate and metadata files exist. Missing Candidates return non-zero with `candidate not found: <candidate_id>`.
 
-The local candidate queue is a local capture queue and local workspace record only. It does not admit an Act to any remote spine, does not close receipts, does not prove evidence, and is not remote synced.
+`logline-lab candidate index rebuild [--home <path>]` scans local candidate directories and rewrites `.logline-lab/candidates/index.json` as queue metadata only.
+
+The Candidate index is local operational metadata used for listing/status/reporting. It is not a ledger, official spine, receipt, evidence, or source of truth. The local candidate queue is a local capture queue and local workspace record only. It does not admit an Act to any remote spine, does not close receipts, does not prove evidence, and is not remote synced.
 
 ## Ghost list and report commands
 
@@ -59,7 +62,7 @@ Daily State is a local report/projection over the workspace:
 logline-lab report generate daily-state --home .
 ```
 
-`logline-lab report generate daily-state [--home <path>]` requires an initialized Lab home, includes selected pack/profile and profile capability state, counts local Candidates, reads local Ghosts, and writes `.logline-lab/reports/daily-state.md`. Reports are local read models and operator reports. Reports do not close receipts, do not prove evidence, do not write remote state, and do not create official state.
+`logline-lab report generate daily-state [--home <path>]` requires an initialized Lab home, includes selected pack/profile and profile capability state, counts local Candidates through the local Candidate index when available, includes Candidate Index state/list details, reads local Ghosts, and writes `.logline-lab/reports/daily-state.md`. Reports are local read models and operator reports. Reports do not close receipts, do not prove evidence, do not write remote state, and do not create official state.
 
 ## Act commands
 

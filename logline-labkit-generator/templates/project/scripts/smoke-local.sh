@@ -53,6 +53,8 @@ assert_contains "$OUT_DIR/validate.out" "valid LogLine Act"
 run_capture add candidate add --home "$HOME_DIR" --file "$ACT"
 assert_contains "$OUT_DIR/add.out" "candidate captured"
 assert_contains "$OUT_DIR/add.out" "not official spine"
+assert_contains "$OUT_DIR/add.out" "index: available"
+test -f "$HOME_DIR/.logline-lab/candidates/index.json"
 CANDIDATE_ID="$(awk '/^id: / { print $2; exit }' "$OUT_DIR/add.out")"
 if [ -z "$CANDIDATE_ID" ]; then
   echo "smoke-local: missing candidate id" >&2
@@ -62,6 +64,7 @@ fi
 
 run_capture list candidate list --home "$HOME_DIR"
 assert_contains "$OUT_DIR/list.out" "candidates: 1"
+assert_contains "$OUT_DIR/list.out" "index: available"
 assert_contains "$OUT_DIR/list.out" "$CANDIDATE_ID"
 
 run_capture get candidate get "$CANDIDATE_ID" --home "$HOME_DIR"
@@ -77,10 +80,13 @@ assert_contains "$OUT_DIR/report.out" "daily-state report generated"
 test -f "$HOME_DIR/.logline-lab/reports/daily-state.md"
 assert_contains "$HOME_DIR/.logline-lab/reports/daily-state.md" "# Daily Lab State"
 assert_contains "$HOME_DIR/.logline-lab/reports/daily-state.md" "Candidates: 1"
+assert_contains "$HOME_DIR/.logline-lab/reports/daily-state.md" "## Candidate Index"
+assert_contains "$HOME_DIR/.logline-lab/reports/daily-state.md" "State: available"
 
 run_capture status status --home "$HOME_DIR"
 assert_contains "$OUT_DIR/status.out" "status: local LogLine Lab workspace"
 assert_contains "$OUT_DIR/status.out" "candidate_count: 1"
+assert_contains "$OUT_DIR/status.out" "candidate_index: available"
 assert_contains "$OUT_DIR/status.out" "reports_available: 1"
 
 echo "smoke-local: ok"

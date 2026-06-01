@@ -176,6 +176,28 @@ fn dispatch_candidate(args: &[String]) -> i32 {
                 1
             }
         },
+        [action, subaction, rest @ ..] if action == "index" && subaction == "rebuild" => {
+            match home_from_args(rest) {
+                Ok(home) => match logline_lab_core::LabHome::new(&home).rebuild_candidate_index() {
+                    Ok(list) => {
+                        println!("candidate index rebuilt");
+                        println!("home: {}", home.display());
+                        println!("candidates: {}", list.records.len());
+                        println!("index: {}", list.index_status.as_cli_status());
+                        println!("authority: local capture queue index only; not official spine; not receipt; not remote synced");
+                        0
+                    }
+                    Err(err) => {
+                        eprintln!("{err}");
+                        1
+                    }
+                },
+                Err(message) => {
+                    eprintln!("{message}");
+                    1
+                }
+            }
+        }
         [action, candidate_id, rest @ ..] if action == "get" => match home_from_args(rest) {
             Ok(home) => match logline_lab_core::get_candidate(&home, candidate_id) {
                 Ok(record) => {
@@ -193,7 +215,7 @@ fn dispatch_candidate(args: &[String]) -> i32 {
             }
         },
         _ => {
-            eprintln!("usage: logline-lab candidate <add --file <path>|list|get <candidate_id>> [--home <path>]");
+            eprintln!("usage: logline-lab candidate <add --file <path>|list|get <candidate_id>|index rebuild> [--home <path>]");
             1
         }
     }
@@ -323,7 +345,7 @@ fn home_from_args(args: &[String]) -> Result<PathBuf, String> {
         [flag] if flag == "--home" => Err("missing value for --home".to_string()),
         [path] => Ok(PathBuf::from(path)),
         _ => Err(
-            "usage: logline-lab <init|doctor|status|candidate list|candidate get|ghost list|report generate daily-state> [--home <path>]"
+            "usage: logline-lab <init|doctor|status|candidate list|candidate get|candidate index rebuild|ghost list|report generate daily-state> [--home <path>]"
                 .to_string(),
         ),
     }
@@ -367,7 +389,7 @@ fn print_nested_command_help(scope: &str, action: &str) {
         }
         ("candidate", "add") => {
             println!("Usage: logline-lab candidate add --home <path> --file <path>");
-            println!("Captures a local Candidate only; it is not a ledger entry or official spine write.");
+            println!("Captures a local Candidate only; it is not an official spine write, receipt, or remote sync.");
         }
         ("candidate", "list") => {
             println!("Usage: logline-lab candidate list --home <path>");
@@ -376,6 +398,10 @@ fn print_nested_command_help(scope: &str, action: &str) {
         ("candidate", "get") => {
             println!("Usage: logline-lab candidate get <candidate_id> --home <path>");
             println!("Shows local Candidate content and metadata only.");
+        }
+        ("candidate", "index") => {
+            println!("Usage: logline-lab candidate index rebuild --home <path>");
+            println!("Rebuilds local Candidate index workspace metadata only.");
         }
         ("ghost", "list") => {
             println!("Usage: logline-lab ghost list --home <path>");
@@ -416,6 +442,7 @@ fn print_help() {
     );
     println!("  candidate list --home <path>                        List local Candidates");
     println!("  candidate get <candidate_id> --home <path>          Show one local Candidate");
+    println!("  candidate index rebuild --home <path>               Rebuild local Candidate index");
     println!();
     println!("Ghost and report commands:");
     println!("  ghost list --home <path>                            List unresolved local Ghosts");

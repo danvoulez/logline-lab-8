@@ -122,10 +122,12 @@ fn daily_state_report_writes_markdown_with_authority_and_zero_candidates() {
     let report = fs::read_to_string(path).expect("read report");
     assert!(report.contains("# Daily Lab State"));
     assert!(report.contains("This report is a local workspace projection."));
-    assert!(report.contains(
-        "It is not official spine truth, not evidence, not a receipt, and not remote sync."
-    ));
+    assert!(report
+        .contains("It is not official spine, not evidence, not a receipt, and not remote sync."));
     assert!(report.contains("- Candidates: 0"));
+    assert!(report.contains("- Candidate index: available"));
+    assert!(report.contains("## Candidate Index"));
+    assert!(report.contains("- State: available"));
     assert!(report.contains("- Ghosts: 6"));
     let _ = fs::remove_dir_all(home);
 }
@@ -155,6 +157,8 @@ fn daily_state_report_counts_candidate_after_add() {
     let report =
         fs::read_to_string(home.join(".logline-lab/reports/daily-state.md")).expect("read report");
     assert!(report.contains("- Candidates: 1"));
+    assert!(report.contains("- Candidate index: available"));
+    assert!(report.contains("- Candidates indexed: 1"));
     assert!(report.contains("- cand_"));
     let _ = fs::remove_dir_all(home);
 }
