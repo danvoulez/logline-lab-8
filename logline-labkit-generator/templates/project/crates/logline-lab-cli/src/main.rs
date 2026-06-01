@@ -42,23 +42,45 @@ fn dispatch(args: &[String]) -> i32 {
             2
         }
         [scope, action] if scope == "act" && action == "validate" => {
-            println!("partial: provide --file <path> to validate a candidate Act text");
+            println!("partial: provide --file <path> to validate a JSON LogLine Act");
             0
         }
-        [scope, action, flag, path] if scope == "act" && action == "validate" && flag == "--file" => {
+        [scope, action, flag, path]
+            if scope == "act" && action == "validate" && flag == "--file" =>
+        {
             match fs::read_to_string(path) {
-                Ok(input) => { println!("{}", logline_lab_core::validate_text(&input)); 0 }
-                Err(err) => { eprintln!("ghost: unable-to-read-act-file: {err}"); 1 }
+                Ok(input) => match logline_lab_core::validate_text_result(&input) {
+                    Ok(message) => {
+                        println!("{message}");
+                        0
+                    }
+                    Err(message) => {
+                        eprintln!("{message}");
+                        1
+                    }
+                },
+                Err(err) => {
+                    eprintln!("ghost: unable-to-read-act-file: {err}");
+                    1
+                }
             }
         }
         [scope, action, flag, path] if scope == "act" && action == "emit" && flag == "--file" => {
             match fs::read_to_string(path) {
-                Ok(input) => {
-                    println!("{}", logline_lab_core::validate_text(&input));
-                    println!("partial: emit preview only; no receipt is closed by this command");
-                    0
+                Ok(input) => match logline_lab_core::emit_preview_result(&input) {
+                    Ok(message) => {
+                        println!("{message}");
+                        0
+                    }
+                    Err(message) => {
+                        eprintln!("{message}");
+                        1
+                    }
+                },
+                Err(err) => {
+                    eprintln!("ghost: unable-to-read-act-file: {err}");
+                    1
                 }
-                Err(err) => { eprintln!("ghost: unable-to-read-act-file: {err}"); 1 }
             }
         }
         _ => {

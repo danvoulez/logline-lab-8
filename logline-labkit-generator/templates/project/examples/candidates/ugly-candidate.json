@@ -1,0 +1,22 @@
+{
+  "who": "dan",
+  "did": "dump_thought",
+  "this": {
+    "raw": "messy half-formed thought about LogLine packs",
+    "quality": "ugly but captured"
+  },
+  "when": "2026-06-01T00:00:00Z",
+  "confirmed_by": {
+    "source": "operator_text"
+  },
+  "if_ok": {
+    "project": ["planning_corpus"]
+  },
+  "if_doubt": {
+    "open_ghost": "candidate-needs-qualification"
+  },
+  "if_not": {
+    "reject": "not-operator-confirmed"
+  },
+  "status": "candidate"
+}

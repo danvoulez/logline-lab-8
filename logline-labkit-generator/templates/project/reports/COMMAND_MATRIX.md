@@ -13,14 +13,18 @@ implemented: core loaded; profile checks are partial; no external provider requi
 partial: generated lab kit is present; runtime execution surfaces are ghosts
 
 ## logline-lab act validate
-partial: provide --file <path> to validate a candidate Act text
+partial: provide --file <path> to validate a JSON LogLine Act
 
 ## logline-lab act validate --file examples/acts/minimal.act.json
-implemented: act contains the nine canonical slots
+valid LogLine Act
+slots: 9/9
+status: candidate
 
 ## logline-lab act emit --file examples/acts/minimal.act.json
-implemented: act contains the nine canonical slots
-partial: emit preview only; no receipt is closed by this command
+valid LogLine Act
+slots: 9/9
+status: candidate
+partial: act validated; emit preview only; no storage, no receipt, no remote spine write
 
 ## logline-lab lab
 ghost expected
