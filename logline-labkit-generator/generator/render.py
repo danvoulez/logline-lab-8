@@ -162,6 +162,7 @@ def render_ghost_report():
             "- Implemented: local Candidate add/list/get captures validated JSON Acts into the local candidate queue only.",
             "- Implemented: local Ghost listing reads `.logline-lab/GHOSTS.md` and `.logline-lab/ghosts/`.",
             "- Implemented: Daily State report generation writes a local workspace projection under `.logline-lab/reports/`.",
+            "- Implemented: local Projection list/generate names `.logline-lab/projections/` local read models and writes `local-summary.md`.",
             "",
             "## Pack/profile catalog state",
             "",

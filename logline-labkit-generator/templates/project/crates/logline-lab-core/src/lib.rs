@@ -2,6 +2,7 @@ pub mod candidates;
 pub mod catalog;
 pub mod ghosts;
 pub mod lab_home;
+pub mod projections;
 pub mod reports;
 
 use std::path::Path;
@@ -57,6 +58,19 @@ pub fn generate_daily_state_report(
     home: impl AsRef<Path>,
 ) -> Result<reports::DailyStateReport, reports::ReportError> {
     LabHome::new(home.as_ref()).generate_daily_state_report()
+}
+
+pub fn list_projections(
+    home: impl AsRef<Path>,
+) -> Result<projections::ProjectionList, projections::ProjectionError> {
+    LabHome::new(home.as_ref()).list_projections()
+}
+
+pub fn generate_projection(
+    home: impl AsRef<Path>,
+    kind: projections::ProjectionKind,
+) -> Result<projections::LocalSummaryProjection, projections::ProjectionError> {
+    LabHome::new(home.as_ref()).generate_projection(kind)
 }
 
 pub fn doctor_report() -> String {

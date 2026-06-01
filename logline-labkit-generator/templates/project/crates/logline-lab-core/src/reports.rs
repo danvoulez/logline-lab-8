@@ -20,6 +20,7 @@ pub struct DailyStateReport {
     pub candidate_count: usize,
     pub candidate_index_state: crate::candidates::CandidateIndexState,
     pub ghost_count: usize,
+    pub projections_available: usize,
 }
 
 #[derive(Debug)]
@@ -94,6 +95,7 @@ impl LabHome {
             candidate_count: candidate_list.records.len(),
             candidate_index_state: candidate_list.index_status,
             ghost_count: ghost_list.ghosts.len(),
+            projections_available: self.projection_count(),
         })
     }
 }
@@ -109,6 +111,7 @@ impl DailyStateReport {
                 self.candidate_index_state.as_cli_status()
             ),
             format!("ghost_count: {}", self.ghost_count),
+            format!("projections_available: {}", self.projections_available),
             "authority: local workspace projection only; not receipt; not evidence; not remote sync".to_string(),
         ]
         .join("\n")
@@ -167,6 +170,7 @@ fn render_daily_state_report(
             candidate_index_state.as_cli_status()
         ),
         format!("- Ghosts: {}", ghost_list.ghosts.len()),
+        format!("- Projections available: {}", lab_home.projection_count()),
         String::new(),
         "## Ghosts".to_string(),
         String::new(),
