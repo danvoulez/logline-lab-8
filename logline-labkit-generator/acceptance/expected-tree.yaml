@@ -10,6 +10,7 @@ required_paths:
   - crates/logline-lab-core/src/candidates.rs
   - crates/logline-lab-core/src/catalog.rs
   - crates/logline-lab-core/src/ghosts.rs
+  - crates/logline-lab-core/src/projections.rs
   - crates/logline-lab-core/src/reports.rs
   - docs/00-overview.md
   - docs/release/RELEASE_CHECKLIST.md
@@ -31,9 +32,11 @@ required_paths:
   - crates/logline-lab-cli/tests/candidates.rs
   - crates/logline-lab-cli/tests/candidate_index.rs
   - crates/logline-lab-cli/tests/reports.rs
+  - crates/logline-lab-cli/tests/projections.rs
   - crates/logline-lab-cli/tests/packs_profiles.rs
   - crates/logline-lab-cli/tests/help_version.rs
   - docs/09-schemas-and-fixtures.md
+  - docs/10-projections.md
   - schemas/candidate-metadata.schema.json
   - schemas/candidate-index.schema.json
   - examples/fixtures.index.md

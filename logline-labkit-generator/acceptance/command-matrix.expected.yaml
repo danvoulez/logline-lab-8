@@ -12,6 +12,8 @@ commands:
   - logline-lab act validate
   - logline-lab act emit --file <path>
   - logline-lab ghost list
+  - logline-lab projection list
+  - logline-lab projection generate local-summary
   - logline-lab report generate daily-state
   - logline-lab lab
   - logline-lab chat

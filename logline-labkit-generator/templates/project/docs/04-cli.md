@@ -19,11 +19,11 @@ logline-lab doctor --home .
 logline-lab status --home .
 ```
 
-`logline-lab init [--home <path>] [--pack <id>] [--profile <id>]` validates the selected pack/profile against the initial local catalog, creates `.logline-lab/` with an editable `lab.manifest.yaml`, `STATUS.md`, `GHOSTS.md`, and local operational directories for candidates, reports, ghosts, profiles, and packs. It also creates an empty `.logline-lab/candidates/index.json` local Candidate index. Defaults are `--pack santo-andre --profile local-offline`. Init is idempotent and does not overwrite existing manifest/status/ghost files.
+`logline-lab init [--home <path>] [--pack <id>] [--profile <id>]` validates the selected pack/profile against the initial local catalog, creates `.logline-lab/` with an editable `lab.manifest.yaml`, `STATUS.md`, `GHOSTS.md`, and local operational directories for candidates, reports, ghosts, profiles, packs, and projections. It also creates an empty `.logline-lab/candidates/index.json` local Candidate index and `.logline-lab/projections/projection-index.json` local projection metadata. Defaults are `--pack santo-andre --profile local-offline`. Init is idempotent and does not overwrite existing manifest/status/ghost files.
 
 `logline-lab doctor [--home <path>]` checks the local home structure, validates selected pack/profile ids from the manifest when present, verifies `.logline-lab/candidates/` exists, checks the local Candidate index is parseable and consistent, and checks required generated project docs, examples, and schemas. An empty local candidate queue is healthy. Supabase profile declarations are reported as Ghost/unconfigured rather than requiring env vars in this PR state. Doctor returns non-zero when required local structure is missing, a selected pack/profile id is unknown, or the candidate index is malformed/inconsistent. Missing candidate index files are reported as warnings with the rebuild command.
 
-`logline-lab status [--home <path>]` reads the local workspace state, shows selected pack/profile, includes `candidate_count` and `candidate_index`, reports `local_candidate_queue: available` when initialized, lists Ghost records, includes report count/latest report when present, and reports profile capability state plus remote spine, evidence registry, receipt closure, interactive UX, YAML parsing, and LLM translator surfaces as ghosted or unimplemented.
+`logline-lab status [--home <path>]` reads the local workspace state, shows selected pack/profile, includes `candidate_count` and `candidate_index`, reports `local_candidate_queue: available` when initialized, lists Ghost records, includes report count/latest report and projection count/latest projection when present, and reports profile capability state plus remote spine, evidence registry, receipt closure, interactive UX, YAML parsing, and LLM translator surfaces as ghosted or unimplemented.
 
 ## Candidate commands
 
@@ -63,6 +63,20 @@ logline-lab report generate daily-state --home .
 ```
 
 `logline-lab report generate daily-state [--home <path>]` requires an initialized Lab home, includes selected pack/profile and profile capability state, counts local Candidates through the local Candidate index when available, includes Candidate Index state/list details, reads local Ghosts, and writes `.logline-lab/reports/daily-state.md`. Reports are local read models and operator reports. Reports do not close receipts, do not prove evidence, do not write remote state, and do not create official state.
+
+
+## Projection commands
+
+Projections are local read models over workspace state. They are derived views and regenerated summaries for operators. They are not canon, not receipts, not evidence, and not remote sync.
+
+```sh
+logline-lab projection list --home .
+logline-lab projection generate local-summary --home .
+```
+
+`logline-lab projection list [--home <path>]` requires an initialized Lab home. It lists generated local projections, initially recognizes the `local-summary` projection kind, and shows the generated path/state when `.logline-lab/projections/local-summary.md` exists.
+
+`logline-lab projection generate local-summary [--home <path>]` requires an initialized Lab home, reads selected pack/profile, Candidate count and index state, Ghosts, reports, projection metadata, and profile capabilities, then writes `.logline-lab/projections/local-summary.md`. It also updates `.logline-lab/projections/projection-index.json` as local read-model metadata only.
 
 ## Act commands
 

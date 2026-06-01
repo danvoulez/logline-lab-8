@@ -29,6 +29,7 @@ logline-lab candidate add --home ./demo-lab --file examples/acts/minimal.act.jso
 logline-lab candidate list --home ./demo-lab
 logline-lab ghost list --home ./demo-lab
 logline-lab report generate daily-state --home ./demo-lab
+logline-lab projection generate local-summary --home ./demo-lab
 logline-lab status --home ./demo-lab
 ```
 
@@ -43,6 +44,7 @@ Implemented:
 - Local Candidate capture, list, and get.
 - Ghost list.
 - Daily State report generation.
+- Local projection list and local-summary generation.
 - Pack/profile selection.
 - CLI help and version output.
 
@@ -70,17 +72,19 @@ logline-lab candidate list --home ./demo-lab
 
 Candidate capture is local operational capture. It validates canonical Act shape and writes a local Candidate record; it does not admit to a remote spine or close a receipt.
 
-## First Daily State report
+## First Daily State report and local summary projection
 
 ```bash
 logline-lab report generate daily-state --home ./demo-lab
+logline-lab projection generate local-summary --home ./demo-lab
 logline-lab status --home ./demo-lab
 ```
 
-Daily State is a local report/projection over the workspace. Reports do not close receipts, do not prove evidence, and do not create official state.
+Daily State is a local report/projection over the workspace. The local summary projection is a regenerated local read model under `.logline-lab/projections/`. These read-side views do not close receipts, do not prove evidence, and do not create official state.
 
 ## More docs
 
 - `docs/04-cli.md` — command matrix and authority boundaries.
 - `docs/05-install.md` — install methods and troubleshooting.
+- `docs/10-projections.md` — local projection contract and local-summary behavior.
 - `reports/GHOSTS.md` — current Ghost inventory.

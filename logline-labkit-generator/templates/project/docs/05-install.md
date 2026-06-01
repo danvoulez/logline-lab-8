@@ -49,10 +49,13 @@ logline-lab candidate list --home ./demo-lab
 logline-lab candidate index rebuild --home ./demo-lab
 logline-lab ghost list --home ./demo-lab
 logline-lab report generate daily-state --home ./demo-lab
+logline-lab projection list --home ./demo-lab
+logline-lab projection generate local-summary --home ./demo-lab
+logline-lab projection list --home ./demo-lab
 logline-lab status --home ./demo-lab
 ```
 
-The initialized home includes `.logline-lab/candidates/index.json` as a local Candidate index for listing/status/reporting. The Candidate index is local operational metadata, not a ledger, official spine, receipt, evidence, or source of truth. The initialized home is local workspace state only. It is not an official spine, not a receipt store, not evidence proof, and not remote sync.
+The initialized home includes `.logline-lab/candidates/index.json` as a local Candidate index for listing/status/reporting and `.logline-lab/projections/` for local read-model outputs. The Candidate index is local operational metadata, not a ledger, official spine, receipt, evidence, or source of truth. The initialized home is local workspace state only. It is not an official spine, not a receipt store, not evidence proof, and not remote sync.
 
 ## What install does and does not do
 
@@ -113,3 +116,7 @@ Initialize a Lab home first:
 ```bash
 logline-lab init --home ./demo-lab --pack santo-andre --profile local-offline
 ```
+
+### Projection generation
+
+Use `logline-lab projection generate local-summary --home ./demo-lab` to write a regenerated local read model under `.logline-lab/projections/local-summary.md`. The projection is an operator-facing summary only; it does not close receipts, prove evidence, amend canon, or sync remote state.

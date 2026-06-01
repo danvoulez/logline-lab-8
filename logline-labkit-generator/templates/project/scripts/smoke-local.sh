@@ -38,6 +38,7 @@ run_capture help --help
 assert_contains "$OUT_DIR/help.out" "CLI-first local LogLine Lab Kit"
 assert_contains "$OUT_DIR/help.out" "candidate add"
 assert_contains "$OUT_DIR/help.out" "report generate daily-state"
+assert_contains "$OUT_DIR/help.out" "projection generate local-summary"
 
 run_capture init init --home "$HOME_DIR" --pack santo-andre --profile local-offline
 assert_contains "$OUT_DIR/init.out" "initialized local LogLine Lab home"
@@ -75,6 +76,10 @@ run_capture ghosts ghost list --home "$HOME_DIR"
 assert_contains "$OUT_DIR/ghosts.out" "remote-spine-unconfigured"
 assert_contains "$OUT_DIR/ghosts.out" "authority: local workspace Ghost list only"
 
+run_capture projection_list_empty projection list --home "$HOME_DIR"
+assert_contains "$OUT_DIR/projection_list_empty.out" "projections: 0"
+assert_contains "$OUT_DIR/projection_list_empty.out" "local-summary"
+
 run_capture report report generate daily-state --home "$HOME_DIR"
 assert_contains "$OUT_DIR/report.out" "daily-state report generated"
 test -f "$HOME_DIR/.logline-lab/reports/daily-state.md"
@@ -83,10 +88,22 @@ assert_contains "$HOME_DIR/.logline-lab/reports/daily-state.md" "Candidates: 1"
 assert_contains "$HOME_DIR/.logline-lab/reports/daily-state.md" "## Candidate Index"
 assert_contains "$HOME_DIR/.logline-lab/reports/daily-state.md" "State: available"
 
+run_capture projection_generate projection generate local-summary --home "$HOME_DIR"
+assert_contains "$OUT_DIR/projection_generate.out" "local-summary projection generated"
+test -f "$HOME_DIR/.logline-lab/projections/local-summary.md"
+assert_contains "$HOME_DIR/.logline-lab/projections/local-summary.md" "# Local Summary Projection"
+assert_contains "$HOME_DIR/.logline-lab/projections/local-summary.md" "Candidates: 1"
+
+run_capture projection_list projection list --home "$HOME_DIR"
+assert_contains "$OUT_DIR/projection_list.out" "projections: 1"
+assert_contains "$OUT_DIR/projection_list.out" "state=available"
+
 run_capture status status --home "$HOME_DIR"
 assert_contains "$OUT_DIR/status.out" "status: local LogLine Lab workspace"
 assert_contains "$OUT_DIR/status.out" "candidate_count: 1"
 assert_contains "$OUT_DIR/status.out" "candidate_index: available"
 assert_contains "$OUT_DIR/status.out" "reports_available: 1"
+assert_contains "$OUT_DIR/status.out" "projections_available: 1"
+assert_contains "$OUT_DIR/status.out" "local-summary.md"
 
 echo "smoke-local: ok"

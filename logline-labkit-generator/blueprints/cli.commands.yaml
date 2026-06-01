@@ -86,6 +86,20 @@
       "ghosts_or_notes": "Ghosts are not fatal by default."
     },
     {
+      "command": "logline-lab projection list",
+      "status": "implemented",
+      "scope": "local projection read models",
+      "authority_limit": "local read model only; not truth; not receipt; not evidence",
+      "ghosts_or_notes": "Lists generated local projections and available local projection kinds."
+    },
+    {
+      "command": "logline-lab projection generate local-summary",
+      "status": "implemented",
+      "scope": "generated workspace projection",
+      "authority_limit": "local read model only; not truth; not receipt; not evidence",
+      "ghosts_or_notes": "Writes a regenerated operator-facing summary; no remote sync."
+    },
+    {
       "command": "logline-lab report generate daily-state",
       "status": "implemented",
       "scope": "local projection/report",

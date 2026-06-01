@@ -78,6 +78,7 @@ fn dispatch(args: &[String]) -> i32 {
         },
         [scope, rest @ ..] if scope == "candidate" => dispatch_candidate(rest),
         [scope, rest @ ..] if scope == "ghost" => dispatch_ghost(rest),
+        [scope, rest @ ..] if scope == "projection" => dispatch_projection(rest),
         [scope, rest @ ..] if scope == "report" => dispatch_report(rest),
         [cmd] if cmd == "lab" => {
             eprintln!("Ghost: interactive-lab-surface-unimplemented");
@@ -246,6 +247,62 @@ fn dispatch_ghost(args: &[String]) -> i32 {
     }
 }
 
+fn dispatch_projection(args: &[String]) -> i32 {
+    match args {
+        [action, rest @ ..] if action == "list" => match home_from_args(rest) {
+            Ok(home) => match logline_lab_core::list_projections(&home) {
+                Ok(list) => {
+                    println!("{}", list.to_text());
+                    0
+                }
+                Err(err) => {
+                    eprintln!("{err}");
+                    1
+                }
+            },
+            Err(message) => {
+                eprintln!("{message}");
+                1
+            }
+        },
+        [action, kind, rest @ ..] if action == "generate" => {
+            let projection_kind = match logline_lab_core::projections::ProjectionKind::parse(kind) {
+                Ok(kind) => kind,
+                Err(err) => {
+                    eprintln!("{err}");
+                    return 1;
+                }
+            };
+            match home_from_args(rest) {
+                Ok(home) => match logline_lab_core::generate_projection(&home, projection_kind) {
+                    Ok(projection) => {
+                        println!("{}", projection.to_text());
+                        0
+                    }
+                    Err(err) => {
+                        eprintln!("{err}");
+                        1
+                    }
+                },
+                Err(message) => {
+                    eprintln!("{message}");
+                    1
+                }
+            }
+        }
+        [action] if action == "generate" => {
+            eprintln!("usage: logline-lab projection generate local-summary [--home <path>]");
+            1
+        }
+        _ => {
+            eprintln!(
+                "usage: logline-lab projection <list|generate local-summary> [--home <path>]"
+            );
+            1
+        }
+    }
+}
+
 fn dispatch_report(args: &[String]) -> i32 {
     match args {
         [action, kind, rest @ ..] if action == "generate" && kind == "daily-state" => {
@@ -345,7 +402,7 @@ fn home_from_args(args: &[String]) -> Result<PathBuf, String> {
         [flag] if flag == "--home" => Err("missing value for --home".to_string()),
         [path] => Ok(PathBuf::from(path)),
         _ => Err(
-            "usage: logline-lab <init|doctor|status|candidate list|candidate get|candidate index rebuild|ghost list|report generate daily-state> [--home <path>]"
+            "usage: logline-lab <init|doctor|status|candidate list|candidate get|candidate index rebuild|ghost list|projection list|projection generate local-summary|report generate daily-state> [--home <path>]"
                 .to_string(),
         ),
     }
@@ -411,6 +468,16 @@ fn print_nested_command_help(scope: &str, action: &str) {
             println!("Usage: logline-lab report generate daily-state --home <path>");
             println!("Generates a local workspace projection only; it is not a receipt.");
         }
+        ("projection", "list") => {
+            println!("Usage: logline-lab projection list --home <path>");
+            println!(
+                "Lists local projection read models only; not truth, not receipt, not evidence."
+            );
+        }
+        ("projection", "generate") => {
+            println!("Usage: logline-lab projection generate local-summary --home <path>");
+            println!("Generates a local read model summary only; not truth, not receipt, not evidence, not remote sync.");
+        }
         _ => print_help(),
     }
 }
@@ -447,6 +514,10 @@ fn print_help() {
     println!("Ghost and report commands:");
     println!("  ghost list --home <path>                            List unresolved local Ghosts");
     println!("  report generate daily-state --home <path>           Write a local Daily State projection");
+    println!(
+        "  projection list --home <path>                       List local projection read models"
+    );
+    println!("  projection generate local-summary --home <path>     Generate the local-summary read model");
     println!();
     println!("Ghost commands:");
     println!("  lab                                                 Ghost: interactive-lab-surface-unimplemented");

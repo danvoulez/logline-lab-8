@@ -7,7 +7,14 @@ pub const LOCAL_DIR: &str = ".logline-lab";
 pub const MANIFEST_FILE: &str = "lab.manifest.yaml";
 pub const STATUS_FILE: &str = "STATUS.md";
 pub const GHOSTS_FILE: &str = "GHOSTS.md";
-pub const LOCAL_DIRS: &[&str] = &["candidates", "reports", "ghosts", "profiles", "packs"];
+pub const LOCAL_DIRS: &[&str] = &[
+    "candidates",
+    "reports",
+    "ghosts",
+    "profiles",
+    "packs",
+    "projections",
+];
 pub const PROJECT_REQUIRED_PATHS: &[&str] = &[
     "schemas/logline-act.schema.json",
     "schemas/lab-manifest.schema.json",
@@ -57,6 +64,7 @@ pub struct DoctorReport {
     pub candidate_index_entries: usize,
     pub candidate_directories: usize,
     pub ghosts: Vec<&'static str>,
+    pub projection_index_state: crate::projections::ProjectionIndexState,
 }
 
 #[derive(Debug, Clone)]
@@ -74,6 +82,8 @@ pub struct LabHomeStatus {
     pub ghosts: Vec<String>,
     pub reports_available: usize,
     pub latest_report: Option<PathBuf>,
+    pub projections_available: usize,
+    pub latest_projection: Option<PathBuf>,
 }
 
 impl LabHome {
@@ -125,6 +135,7 @@ impl LabHome {
             write_if_missing(&path.join(".keep"), "")?;
         }
         self.initialize_candidate_index_if_missing()?;
+        self.initialize_projection_index_if_missing()?;
         Ok(InitReport {
             home: self.home.clone(),
             manifest: self.manifest_path(),
@@ -156,7 +167,11 @@ impl LabHome {
         check_candidate_records(&mut failures, &self.local_dir().join("candidates"));
         let candidate_index_inspection = self.candidate_index_inspection();
         failures.extend(candidate_index_inspection.failures.clone());
-        let warnings = candidate_index_inspection.warnings.clone();
+        let mut warnings = candidate_index_inspection.warnings.clone();
+        let projection_index_state = self.projection_index_state();
+        if projection_index_state == crate::projections::ProjectionIndexState::Malformed {
+            warnings.push("projection index: malformed".to_string());
+        }
         match find_project_root() {
             Some(root) => {
                 for required in PROJECT_REQUIRED_PATHS {
@@ -209,6 +224,7 @@ impl LabHome {
             candidate_index_entries: candidate_index_inspection.entries,
             candidate_directories: candidate_index_inspection.directories,
             ghosts,
+            projection_index_state,
         }
     }
 
@@ -245,6 +261,8 @@ impl LabHome {
                 }),
             reports_available: self.report_count(),
             latest_report: self.latest_report_path(),
+            projections_available: self.projection_count(),
+            latest_projection: self.latest_projection_path(),
         }
     }
 
@@ -322,6 +340,10 @@ impl DoctorReport {
         lines.push(format!(
             "candidate directories: {}",
             self.candidate_directories
+        ));
+        lines.push(format!(
+            "projection index: {}",
+            self.projection_index_state.as_cli_status()
         ));
         lines.push(format!(
             "candidate index consistency: {}",
@@ -402,6 +424,14 @@ impl LabHomeStatus {
             format!(
                 "latest_report: {}",
                 self.latest_report
+                    .as_ref()
+                    .map(|path| path.display().to_string())
+                    .unwrap_or_else(|| "none".to_string())
+            ),
+            format!("projections_available: {}", self.projections_available),
+            format!(
+                "latest_projection: {}",
+                self.latest_projection
                     .as_ref()
                     .map(|path| path.display().to_string())
                     .unwrap_or_else(|| "none".to_string())
