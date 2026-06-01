@@ -1,0 +1,56 @@
+# Forbidden Markers
+
+# Act slot violations
+forbidden_act_slots:
+  - selected_branch
+  - runtime envelope
+  - runtime_id
+  - type hints
+  - hashes
+  - passkey checkpoints
+
+# Semantic category violations
+forbidden_categories:
+  - artifact (as positive category)
+  - primitive system
+  - primitives
+
+# Storage violations
+forbidden_storage_claims:
+  - local SQLite truth
+  - SQLite ledger
+  - SQLite spine (as universal)
+  - file ledger
+  - JSON ledger
+  - JSONL ledger
+  - official acts/*.json
+  - official receipts/*.json
+  - official ghosts/*.json
+
+# Authority violations
+forbidden_authority_claims:
+  - Supabase as universal canon
+  - Santo André as official pack
+  - LLM decided
+  - Accepted without Dan approval
+  - DECIDED without Dan approval
+  - architecture decision without Dan approval
+
+# Evidence violations
+forbidden_evidence_claims:
+  - receipt without evidence
+  - tests passed without output
+  - build success without output
+
+# Vendor violations
+forbidden_vendor_operations:
+  - vendor edits
+  - canon amendment
+  - upstream reference edit
+
+# Fake success violations
+forbidden_success_claims:
+  - fake receipt
+  - fake test pass
+  - fake Supabase connection
+  - broad claim from narrow evidence
