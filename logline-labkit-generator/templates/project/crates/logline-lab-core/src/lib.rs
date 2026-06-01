@@ -1,5 +1,7 @@
 pub mod candidates;
+pub mod ghosts;
 pub mod lab_home;
+pub mod reports;
 
 use std::path::Path;
 
@@ -36,6 +38,16 @@ pub fn get_candidate(
     candidate_id: &str,
 ) -> Result<candidates::CandidateRecord, candidates::CandidateError> {
     LabHome::new(home.as_ref()).get_candidate(candidate_id)
+}
+
+pub fn list_ghosts(home: impl AsRef<Path>) -> Result<ghosts::GhostList, ghosts::GhostError> {
+    LabHome::new(home.as_ref()).list_ghosts()
+}
+
+pub fn generate_daily_state_report(
+    home: impl AsRef<Path>,
+) -> Result<reports::DailyStateReport, reports::ReportError> {
+    LabHome::new(home.as_ref()).generate_daily_state_report()
 }
 
 pub fn doctor_report() -> String {

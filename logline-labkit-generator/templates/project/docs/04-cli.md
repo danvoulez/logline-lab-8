@@ -18,7 +18,7 @@ logline-lab status --home .
 
 `logline-lab doctor` checks the local home structure, verifies `.logline-lab/candidates/` exists, and checks required generated project docs, examples, and schemas. An empty local candidate queue is healthy. Doctor returns non-zero when required local structure is missing.
 
-`logline-lab status` reads the local workspace state, includes `candidate_count`, reports `local_candidate_queue: available` when initialized, lists Ghost records, and reports remote spine, evidence registry, receipt closure, interactive UX, YAML parsing, and LLM translator surfaces as ghosted or unimplemented.
+`logline-lab status` reads the local workspace state, includes `candidate_count`, reports `local_candidate_queue: available` when initialized, lists Ghost records, includes report count/latest report when present, and reports remote spine, evidence registry, receipt closure, interactive UX, YAML parsing, and LLM translator surfaces as ghosted or unimplemented.
 
 ## Candidate commands
 
@@ -38,6 +38,24 @@ logline-lab candidate get <candidate_id> --home .
 
 The local candidate queue is a local capture queue and local workspace record only. It does not admit an Act to any remote spine, does not close receipts, does not prove truth, and is not remote synced.
 
+## Ghost list and report commands
+
+Ghosts preserve unresolved local state without making unresolved work fatal by default:
+
+```sh
+logline-lab ghost list --home .
+```
+
+`logline-lab ghost list [--home <path>]` requires an initialized Lab home, reads `.logline-lab/GHOSTS.md` and local `.logline-lab/ghosts/` entries, and prints the current local Ghost keys. Its authority is a local workspace Ghost list only.
+
+Daily State is a local report/projection over the workspace:
+
+```sh
+logline-lab report generate daily-state --home .
+```
+
+`logline-lab report generate daily-state [--home <path>]` requires an initialized Lab home, counts local Candidates, reads local Ghosts, and writes `.logline-lab/reports/daily-state.md`. Reports are local read models and operator reports. Reports do not close receipts, do not prove evidence, do not write remote state, and do not create official truth.
+
 ## Act commands
 
 `logline-lab act validate --file <path>` validates a JSON LogLine Act against the nine-slot shape.
@@ -46,4 +64,4 @@ The local candidate queue is a local capture queue and local workspace record on
 
 ## Ghost commands
 
-`logline-lab lab` and `logline-lab chat` remain Ghosts in this generated kit.
+`logline-lab ghost list` is implemented for local Ghost visibility. `logline-lab lab` and `logline-lab chat` remain Ghosts in this generated kit.

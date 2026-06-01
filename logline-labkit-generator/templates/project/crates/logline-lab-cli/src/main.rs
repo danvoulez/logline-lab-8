@@ -66,6 +66,8 @@ fn dispatch(args: &[String]) -> i32 {
             }
         },
         [scope, rest @ ..] if scope == "candidate" => dispatch_candidate(rest),
+        [scope, rest @ ..] if scope == "ghost" => dispatch_ghost(rest),
+        [scope, rest @ ..] if scope == "report" => dispatch_report(rest),
         [cmd] if cmd == "lab" => {
             eprintln!("Ghost: interactive-lab-surface-unimplemented");
             2
@@ -181,6 +183,58 @@ fn dispatch_candidate(args: &[String]) -> i32 {
     }
 }
 
+fn dispatch_ghost(args: &[String]) -> i32 {
+    match args {
+        [action, rest @ ..] if action == "list" => match home_from_args(rest) {
+            Ok(home) => match logline_lab_core::list_ghosts(&home) {
+                Ok(list) => {
+                    println!("{}", list.to_text());
+                    0
+                }
+                Err(err) => {
+                    eprintln!("{err}");
+                    1
+                }
+            },
+            Err(message) => {
+                eprintln!("{message}");
+                1
+            }
+        },
+        _ => {
+            eprintln!("usage: logline-lab ghost list [--home <path>]");
+            1
+        }
+    }
+}
+
+fn dispatch_report(args: &[String]) -> i32 {
+    match args {
+        [action, kind, rest @ ..] if action == "generate" && kind == "daily-state" => {
+            match home_from_args(rest) {
+                Ok(home) => match logline_lab_core::generate_daily_state_report(&home) {
+                    Ok(report) => {
+                        println!("{}", report.to_text());
+                        0
+                    }
+                    Err(err) => {
+                        eprintln!("{err}");
+                        1
+                    }
+                },
+                Err(message) => {
+                    eprintln!("{message}");
+                    1
+                }
+            }
+        }
+        _ => {
+            eprintln!("usage: logline-lab report generate daily-state [--home <path>]");
+            1
+        }
+    }
+}
+
 fn candidate_add_args(args: &[String]) -> Result<(PathBuf, PathBuf), String> {
     let mut home = PathBuf::from(".");
     let mut file = None;
@@ -218,7 +272,7 @@ fn home_from_args(args: &[String]) -> Result<PathBuf, String> {
         [flag] if flag == "--home" => Err("missing value for --home".to_string()),
         [path] => Ok(PathBuf::from(path)),
         _ => Err(
-            "usage: logline-lab <init|doctor|status|candidate list|candidate get> [--home <path>]"
+            "usage: logline-lab <init|doctor|status|candidate list|candidate get|ghost list|report generate daily-state> [--home <path>]"
                 .to_string(),
         ),
     }
@@ -226,5 +280,5 @@ fn home_from_args(args: &[String]) -> Result<PathBuf, String> {
 
 fn print_help() {
     println!("Usage: logline-lab <command>");
-    println!("Commands: init [--home <path>], doctor [--home <path>], status [--home <path>], candidate add --file <path> [--home <path>], candidate list [--home <path>], candidate get <candidate_id> [--home <path>], act validate [--file <path>], act emit --file <path>, lab, chat");
+    println!("Commands: init [--home <path>], doctor [--home <path>], status [--home <path>], candidate add --file <path> [--home <path>], candidate list [--home <path>], candidate get <candidate_id> [--home <path>], ghost list [--home <path>], report generate daily-state [--home <path>], act validate [--file <path>], act emit --file <path>, lab, chat");
 }
