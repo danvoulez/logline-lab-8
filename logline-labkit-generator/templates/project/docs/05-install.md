@@ -11,3 +11,17 @@ logline-lab status --home .
 ```
 
 The initialized home is local workspace state only. It is not canon, not an official spine, and not a receipt store.
+
+
+## Local Candidate smoke loop
+
+After initialization, the generated CLI can run the local capture loop:
+
+```sh
+logline-lab act validate --file examples/acts/minimal.act.json
+logline-lab candidate add --home . --file examples/acts/minimal.act.json
+logline-lab candidate list --home .
+logline-lab status --home .
+```
+
+Candidate capture is local operational capture. It validates canonical Act shape, writes a local candidate queue record, and keeps authority limited to the local workspace. It does not admit to a remote spine, close receipts, or prove truth.

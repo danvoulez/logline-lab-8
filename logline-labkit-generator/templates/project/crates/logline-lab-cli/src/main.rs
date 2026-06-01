@@ -65,6 +65,7 @@ fn dispatch(args: &[String]) -> i32 {
                 1
             }
         },
+        [scope, rest @ ..] if scope == "candidate" => dispatch_candidate(rest),
         [cmd] if cmd == "lab" => {
             eprintln!("Ghost: interactive-lab-surface-unimplemented");
             2
@@ -123,17 +124,107 @@ fn dispatch(args: &[String]) -> i32 {
     }
 }
 
+fn dispatch_candidate(args: &[String]) -> i32 {
+    match args {
+        [action, rest @ ..] if action == "add" => match candidate_add_args(rest) {
+            Ok((home, file)) => match logline_lab_core::capture_candidate(&home, &file) {
+                Ok(report) => {
+                    println!("{}", report.to_text());
+                    0
+                }
+                Err(err) => {
+                    eprintln!("{err}");
+                    1
+                }
+            },
+            Err(message) => {
+                eprintln!("{message}");
+                1
+            }
+        },
+        [action, rest @ ..] if action == "list" => match home_from_args(rest) {
+            Ok(home) => match logline_lab_core::list_candidates(&home) {
+                Ok(list) => {
+                    println!("{}", list.to_text());
+                    0
+                }
+                Err(err) => {
+                    eprintln!("{err}");
+                    1
+                }
+            },
+            Err(message) => {
+                eprintln!("{message}");
+                1
+            }
+        },
+        [action, candidate_id, rest @ ..] if action == "get" => match home_from_args(rest) {
+            Ok(home) => match logline_lab_core::get_candidate(&home, candidate_id) {
+                Ok(record) => {
+                    println!("{}", record.to_text());
+                    0
+                }
+                Err(err) => {
+                    eprintln!("{err}");
+                    1
+                }
+            },
+            Err(message) => {
+                eprintln!("{message}");
+                1
+            }
+        },
+        _ => {
+            eprintln!("usage: logline-lab candidate <add --file <path>|list|get <candidate_id>> [--home <path>]");
+            1
+        }
+    }
+}
+
+fn candidate_add_args(args: &[String]) -> Result<(PathBuf, PathBuf), String> {
+    let mut home = PathBuf::from(".");
+    let mut file = None;
+    let mut index = 0;
+    while index < args.len() {
+        match args[index].as_str() {
+            "--home" => {
+                index += 1;
+                let value = args
+                    .get(index)
+                    .ok_or_else(|| "missing value for --home".to_string())?;
+                home = PathBuf::from(value);
+            }
+            "--file" => {
+                index += 1;
+                let value = args
+                    .get(index)
+                    .ok_or_else(|| "missing value for --file".to_string())?;
+                file = Some(PathBuf::from(value));
+            }
+            value => return Err(format!("unexpected candidate add argument: {value}")),
+        }
+        index += 1;
+    }
+    let file = file.ok_or_else(|| {
+        "usage: logline-lab candidate add --file <path> [--home <path>]".to_string()
+    })?;
+    Ok((home, file))
+}
+
 fn home_from_args(args: &[String]) -> Result<PathBuf, String> {
     match args {
         [] => Ok(PathBuf::from(".")),
         [flag, path] if flag == "--home" => Ok(PathBuf::from(path)),
         [flag] if flag == "--home" => Err("missing value for --home".to_string()),
         [path] => Ok(PathBuf::from(path)),
-        _ => Err("usage: logline-lab <init|doctor|status> [--home <path>]".to_string()),
+        _ => Err(
+            "usage: logline-lab <init|doctor|status|candidate list|candidate get> [--home <path>]"
+                .to_string(),
+        ),
     }
 }
 
 fn print_help() {
     println!("Usage: logline-lab <command>");
-    println!("Commands: init [--home <path>], doctor [--home <path>], status [--home <path>], act validate [--file <path>], act emit --file <path>, lab, chat");
+    println!("Commands: init [--home <path>], doctor [--home <path>], status [--home <path>], candidate add --file <path> [--home <path>], candidate list [--home <path>], candidate get <candidate_id> [--home <path>], act validate [--file <path>], act emit --file <path>, lab, chat");
 }

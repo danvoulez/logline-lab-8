@@ -4,6 +4,9 @@ commands:
   - logline-lab init
   - logline-lab doctor
   - logline-lab status
+  - logline-lab candidate add --file <path>
+  - logline-lab candidate list
+  - logline-lab candidate get <candidate_id>
   - logline-lab act validate
   - logline-lab act emit --file <path>
   - logline-lab lab
