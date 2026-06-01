@@ -57,6 +57,8 @@ logline-labkit-generator/
 ## Generated Project Structure
 
 dist/logline-lab-kit/
+  .github/
+    pull_request_template.md
   README.md
   LICENSE
   Cargo.toml
@@ -78,6 +80,11 @@ dist/logline-lab-kit/
     06-recovery.md
     07-interactive-ux.md
     08-llm-boundary.md
+    contributing/
+      PR_PRACTICES.md
+      NO_DRIFT_REVIEW.md
+      GENERATOR_WORKFLOW.md
+      AUTHORITY_BOUNDARIES.md
   schemas/
     logline-act.schema.json
     lab-manifest.schema.json

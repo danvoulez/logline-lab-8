@@ -9,6 +9,8 @@ REQUIRED = [
     "crates/logline-act/Cargo.toml", "crates/logline-lab-core/Cargo.toml", "crates/logline-lab-cli/Cargo.toml",
     "docs/00-overview.md", "docs/01-logline-act.md", "docs/02-product.md", "docs/03-packs-and-profiles.md",
     "docs/04-cli.md", "docs/05-install.md", "docs/06-recovery.md", "docs/07-interactive-ux.md", "docs/08-llm-boundary.md",
+    ".github/pull_request_template.md", "docs/contributing/PR_PRACTICES.md", "docs/contributing/NO_DRIFT_REVIEW.md",
+    "docs/contributing/GENERATOR_WORKFLOW.md", "docs/contributing/AUTHORITY_BOUNDARIES.md",
     "schemas/logline-act.schema.json", "schemas/lab-manifest.schema.json", "schemas/pack-manifest.schema.json", "schemas/profile.schema.json",
     "manifests/lab.manifest.example.yaml", "manifests/santo-andre.manifest.example.yaml", "manifests/personal-offline.manifest.example.yaml",
     "profiles/supabase.profile.yaml", "profiles/local-offline.profile.yaml",
