@@ -1,33 +1,11 @@
 # Command Matrix
 
-## logline-lab --version
-logline-lab 0.1.0
-
-## logline-lab init
-partial: lab manifest template is available in manifests/lab.manifest.example.yaml
-
-## logline-lab doctor
-implemented: core loaded; profile checks are partial; no external provider required
-
-## logline-lab status
-partial: generated lab kit is present; runtime execution surfaces are ghosts
-
-## logline-lab act validate
-partial: provide --file <path> to validate a JSON LogLine Act
-
-## logline-lab act validate --file examples/acts/minimal.act.json
-valid LogLine Act
-slots: 9/9
-status: candidate
-
-## logline-lab act emit --file examples/acts/minimal.act.json
-valid LogLine Act
-slots: 9/9
-status: candidate
-partial: act validated; emit preview only; no storage, no receipt, no remote spine write
-
-## logline-lab lab
-ghost expected
-
-## logline-lab chat
-ghost expected
+| Command | Status | Notes |
+| --- | --- | --- |
+| `logline-lab init --home <path>` | implemented | Creates an idempotent local workspace under `.logline-lab/`; not official spine and not receipt. |
+| `logline-lab doctor --home <path>` | implemented | Checks required local workspace paths and generated docs/examples/schemas. |
+| `logline-lab status --home <path>` | implemented | Reports local workspace status and remaining Ghost records. |
+| `logline-lab act validate --file <path>` | implemented | Validates JSON LogLine Acts against the nine canonical slots. |
+| `logline-lab act emit --file <path>` | partial / preview-only | Validates and previews only; no remote write and no receipt closure. |
+| `logline-lab lab` | ghost | `interactive-lab-surface-unimplemented`. |
+| `logline-lab chat` | ghost | `llm-translator-unimplemented`. |

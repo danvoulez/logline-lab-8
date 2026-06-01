@@ -1,11 +1,28 @@
+pub mod lab_home;
+
+use std::path::Path;
+
+use lab_home::LabHome;
 use logline_act::{parse_act_json, ACT_SLOTS};
 
-pub fn doctor_report() -> &'static str {
-    "implemented: core loaded; profile checks are partial; no external provider required"
+pub fn init_lab_home(home: impl AsRef<Path>) -> std::io::Result<lab_home::InitReport> {
+    LabHome::new(home.as_ref()).init()
 }
 
-pub fn status_report() -> &'static str {
-    "partial: generated lab kit is present; runtime execution surfaces are ghosts"
+pub fn doctor_report_for(home: impl AsRef<Path>) -> lab_home::DoctorReport {
+    LabHome::new(home.as_ref()).doctor()
+}
+
+pub fn status_report_for(home: impl AsRef<Path>) -> lab_home::LabHomeStatus {
+    LabHome::new(home.as_ref()).status()
+}
+
+pub fn doctor_report() -> String {
+    doctor_report_for(".").to_text()
+}
+
+pub fn status_report() -> String {
+    status_report_for(".").to_text()
 }
 
 pub fn validate_text(input: &str) -> String {
