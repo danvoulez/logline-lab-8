@@ -1,0 +1,4 @@
+package: personal-offline
+status: complete_lab_practice_pack
+profile: local-offline
+requires_network: false

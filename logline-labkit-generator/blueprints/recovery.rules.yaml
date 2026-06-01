@@ -1,0 +1,6 @@
+recovery:
+  if_missing: create_ghost
+  if_partial: mark_partial
+  if_unverified: mark_unverified
+  if_unsafe: reject_or_ghost
+  no_receipt_without_evidence: true

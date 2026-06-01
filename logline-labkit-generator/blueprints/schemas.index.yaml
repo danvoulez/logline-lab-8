@@ -1,0 +1,5 @@
+schemas:
+  - logline-act.schema.json
+  - lab-manifest.schema.json
+  - pack-manifest.schema.json
+  - profile.schema.json

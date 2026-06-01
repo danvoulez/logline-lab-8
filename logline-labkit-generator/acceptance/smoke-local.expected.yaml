@@ -1,0 +1,1 @@
+commands: [cargo test, scripts/command-matrix.sh]

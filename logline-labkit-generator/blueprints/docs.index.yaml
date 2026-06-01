@@ -1,0 +1,10 @@
+docs:
+  - 00-overview.md
+  - 01-logline-act.md
+  - 02-product.md
+  - 03-packs-and-profiles.md
+  - 04-cli.md
+  - 05-install.md
+  - 06-recovery.md
+  - 07-interactive-ux.md
+  - 08-llm-boundary.md

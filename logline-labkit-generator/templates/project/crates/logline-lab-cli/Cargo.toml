@@ -1,0 +1,11 @@
+[package]
+name = "logline-lab-cli"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "logline-lab"
+path = "src/main.rs"
+
+[dependencies]
+logline-lab-core = { path = "../logline-lab-core" }

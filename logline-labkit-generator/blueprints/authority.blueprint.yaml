@@ -1,0 +1,10 @@
+authority:
+  canon_stays_small: true
+  packs_carry_local_practice: true
+  profiles_carry_capabilities: true
+  llm_role: scribe_or_translator_only
+  forbidden:
+    - canon amendment
+    - vendor edit
+    - fake receipt
+    - fake test pass

@@ -1,0 +1,5 @@
+profile: supabase
+scope: santo-andre-v0-online-spine
+universal: false
+capabilities:
+  - online-act-spine

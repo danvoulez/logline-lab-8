@@ -1,0 +1,9 @@
+/target/
+**/target/
+.DS_Store
+
+# Generated outputs
+dist/
+
+# Local binary corpus inputs
+logline-labkit-generator/corpus/*.zip

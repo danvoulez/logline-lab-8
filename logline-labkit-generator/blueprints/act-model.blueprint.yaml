@@ -1,0 +1,6 @@
+act_model:
+  semantic_unit: LogLine Act
+  slots: [who, did, this, when, confirmed_by, if_ok, if_doubt, if_not, status]
+  candidate_rule: capture_first_improve_legibility_later
+  selected_branch: metadata_or_projection_only
+  envelope: provenance_metadata_or_pack_profile_practice

@@ -1,0 +1,5 @@
+product: LogLine Lab Kit
+mode: cli-first
+web_dashboard: forbidden
+basic_operation_requires_llm: false
+honesty_states: [implemented, partial, ghost, unverified]
