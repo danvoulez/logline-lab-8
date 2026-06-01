@@ -1,6 +1,8 @@
 binary: logline-lab
 commands:
   - logline-lab --version
+  - logline-lab --help
+  - logline-lab init --help
   - logline-lab init
   - logline-lab doctor
   - logline-lab status
@@ -9,5 +11,7 @@ commands:
   - logline-lab candidate get <candidate_id>
   - logline-lab act validate
   - logline-lab act emit --file <path>
+  - logline-lab ghost list
+  - logline-lab report generate daily-state
   - logline-lab lab
   - logline-lab chat

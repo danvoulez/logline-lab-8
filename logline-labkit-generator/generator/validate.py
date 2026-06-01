@@ -5,10 +5,10 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 DIST = ROOT / "dist" / "logline-lab-kit"
 REQUIRED = [
-    "README.md", "LICENSE", "Cargo.toml", "Cargo.lock", "rust-toolchain.toml", "install.sh", ".env.example",
+    "README.md", "VERSION", "LICENSE", "Cargo.toml", "Cargo.lock", "rust-toolchain.toml", "install.sh", ".env.example",
     "crates/logline-act/Cargo.toml", "crates/logline-lab-core/Cargo.toml", "crates/logline-lab-core/src/lab_home.rs", "crates/logline-lab-core/src/candidates.rs", "crates/logline-lab-core/src/catalog.rs", "crates/logline-lab-core/src/ghosts.rs", "crates/logline-lab-core/src/reports.rs", "crates/logline-lab-cli/Cargo.toml",
     "docs/00-overview.md", "docs/01-logline-act.md", "docs/02-product.md", "docs/03-packs-and-profiles.md",
-    "docs/04-cli.md", "docs/05-install.md", "docs/06-recovery.md", "docs/07-interactive-ux.md", "docs/08-llm-boundary.md",
+    "docs/04-cli.md", "docs/05-install.md", "docs/06-recovery.md", "docs/07-interactive-ux.md", "docs/08-llm-boundary.md", "docs/release/RELEASE_CHECKLIST.md",
     ".github/pull_request_template.md", "docs/contributing/PR_PRACTICES.md", "docs/contributing/NO_DRIFT_REVIEW.md",
     "docs/contributing/GENERATOR_WORKFLOW.md", "docs/contributing/AUTHORITY_BOUNDARIES.md",
     "schemas/logline-act.schema.json", "schemas/lab-manifest.schema.json", "schemas/pack-manifest.schema.json", "schemas/profile.schema.json",
@@ -18,7 +18,7 @@ REQUIRED = [
     "examples/acts/minimal.act.json", "examples/candidates/ugly-candidate.json",
     "examples/invalid/missing-confirmed-by.json", "examples/invalid/extra-selected-branch.json", "examples/invalid/extra-runtime-envelope.json",
     "examples/invalid/malformed.json", "examples/invalid/extra-top-level-field.json",
-    "crates/logline-act/tests/act_validation.rs", "crates/logline-lab-cli/tests/cli_act.rs", "crates/logline-lab-cli/tests/lab_home.rs", "crates/logline-lab-cli/tests/candidates.rs", "crates/logline-lab-cli/tests/reports.rs", "crates/logline-lab-cli/tests/packs_profiles.rs", "scripts/smoke-local.sh", "scripts/scan-forbidden-markers.sh", "scripts/command-matrix.sh",
+    "crates/logline-act/tests/act_validation.rs", "crates/logline-lab-cli/tests/cli_act.rs", "crates/logline-lab-cli/tests/lab_home.rs", "crates/logline-lab-cli/tests/candidates.rs", "crates/logline-lab-cli/tests/reports.rs", "crates/logline-lab-cli/tests/packs_profiles.rs", "crates/logline-lab-cli/tests/help_version.rs", "scripts/smoke-local.sh", "scripts/scan-forbidden-markers.sh", "scripts/command-matrix.sh",
     "reports/GHOSTS.md", "reports/COMMAND_MATRIX.md", "reports/FORBIDDEN_MARKER_SCAN.md",
 ]
 

@@ -1,5 +1,6 @@
 required_paths:
   - README.md
+  - VERSION
   - Cargo.toml
   - Cargo.lock
   - crates/logline-act
@@ -11,6 +12,7 @@ required_paths:
   - crates/logline-lab-core/src/ghosts.rs
   - crates/logline-lab-core/src/reports.rs
   - docs/00-overview.md
+  - docs/release/RELEASE_CHECKLIST.md
   - .github/pull_request_template.md
   - docs/contributing/PR_PRACTICES.md
   - docs/contributing/NO_DRIFT_REVIEW.md
@@ -29,3 +31,4 @@ required_paths:
   - crates/logline-lab-cli/tests/candidates.rs
   - crates/logline-lab-cli/tests/reports.rs
   - crates/logline-lab-cli/tests/packs_profiles.rs
+  - crates/logline-lab-cli/tests/help_version.rs

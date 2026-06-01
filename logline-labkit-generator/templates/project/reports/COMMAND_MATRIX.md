@@ -2,6 +2,8 @@
 
 | Command | Status | Notes |
 | --- | --- | --- |
+| `logline-lab --version` | implemented | Prints the generated kit version from `VERSION`. |
+| `logline-lab --help` | implemented | Lists CLI-first local commands and authority boundaries. |
 | `logline-lab init --home <path> --pack <id> --profile <id>` | implemented | Creates an idempotent local workspace under `.logline-lab/`, validates known pack/profile ids, and writes the selection to `lab.manifest.yaml`; defaults are `santo-andre` and `local-offline`; not official spine and not receipt. |
 | `logline-lab doctor --home <path>` | implemented | Checks required local workspace paths, validates selected pack/profile ids when declared in the manifest, and reports unimplemented declared profile capabilities as Ghosts. Empty candidate queue is allowed. |
 | `logline-lab status --home <path>` | implemented | Reports selected pack/profile, `candidate_count`, report count/latest report, local candidate queue availability, profile capability Ghost state, and remaining Ghost records. |
