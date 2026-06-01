@@ -50,6 +50,8 @@ pub struct LabHomeStatus {
     pub candidate_count: usize,
     pub local_candidate_queue_available: bool,
     pub ghosts: Vec<String>,
+    pub reports_available: usize,
+    pub latest_report: Option<PathBuf>,
 }
 
 impl LabHome {
@@ -142,12 +144,15 @@ impl LabHome {
             local_ready: doctor.failures.is_empty(),
             candidate_count: self.candidate_count(),
             local_candidate_queue_available: self.local_dir().join("candidates").is_dir(),
-            ghosts: read_ghost_keys(&self.ghosts_path()).unwrap_or_else(|_| {
-                INITIAL_GHOSTS
-                    .iter()
-                    .map(|ghost| (*ghost).to_string())
-                    .collect()
-            }),
+            ghosts: crate::ghosts::read_ghost_keys_from_markdown(&self.ghosts_path())
+                .unwrap_or_else(|_| {
+                    INITIAL_GHOSTS
+                        .iter()
+                        .map(|ghost| (*ghost).to_string())
+                        .collect()
+                }),
+            reports_available: self.report_count(),
+            latest_report: self.latest_report_path(),
         }
     }
 }
@@ -225,6 +230,14 @@ impl LabHomeStatus {
                 }
             ),
             format!("ghost count: {}", self.ghosts.len()),
+            format!("reports_available: {}", self.reports_available),
+            format!(
+                "latest_report: {}",
+                self.latest_report
+                    .as_ref()
+                    .map(|path| path.display().to_string())
+                    .unwrap_or_else(|| "none".to_string())
+            ),
             "ghosts:".to_string(),
         ];
         for ghost in &self.ghosts {
@@ -312,22 +325,6 @@ fn yes_no(value: bool) -> &'static str {
     }
 }
 
-fn read_ghost_keys(path: &Path) -> io::Result<Vec<String>> {
-    let text = fs::read_to_string(path)?;
-    let ghosts = text
-        .lines()
-        .map(str::trim)
-        .filter_map(|line| {
-            line.strip_prefix("- Ghost: ")
-                .or_else(|| line.strip_prefix("- ghost: "))
-        })
-        .map(str::trim)
-        .filter(|line| !line.is_empty())
-        .map(ToOwned::to_owned)
-        .collect::<Vec<_>>();
-    Ok(ghosts)
-}
-
 fn default_manifest() -> &'static str {
     "manifest_version: 1\nlab:\n  id: local-lab\n  name: Local LogLine Lab\n  kind: logline_lab_instance\nloads:\n  canon: referenced\n  pack: none\n  profile: local-workspace\nrules:\n  act_shape: nine-slot\n  local_home_is_authority: false\n  projections_are_read_models: true\n  llm_is_authority: false\n"
 }
@@ -337,5 +334,5 @@ fn default_status() -> &'static str {
 }
 
 fn default_ghosts() -> &'static str {
-    "# Local LogLine Lab Ghosts\n\n- Ghost: remote-spine-unconfigured\n- Ghost: evidence-registry-unimplemented\n- Ghost: receipt-closure-unimplemented\n- Ghost: interactive-lab-surface-unimplemented\n- Ghost: llm-translator-unimplemented\n- Ghost: yaml-act-parser-unimplemented\n"
+    "# Local LogLine Lab Ghosts\n\n- remote-spine-unconfigured\n- evidence-registry-unimplemented\n- receipt-closure-unimplemented\n- interactive-lab-surface-unimplemented\n- llm-translator-unimplemented\n- yaml-act-parser-unimplemented\n"
 }

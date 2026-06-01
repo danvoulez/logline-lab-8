@@ -11,4 +11,7 @@ cargo run -p logline-lab-cli -- status --home "$HOME_DIR"
 cargo run -p logline-lab-cli -- act validate --file examples/acts/minimal.act.json
 cargo run -p logline-lab-cli -- candidate add --home "$HOME_DIR" --file examples/acts/minimal.act.json
 cargo run -p logline-lab-cli -- candidate list --home "$HOME_DIR"
+cargo run -p logline-lab-cli -- ghost list --home "$HOME_DIR"
+cargo run -p logline-lab-cli -- report generate daily-state --home "$HOME_DIR"
+test -f "$HOME_DIR/.logline-lab/reports/daily-state.md"
 cargo run -p logline-lab-cli -- status --home "$HOME_DIR"

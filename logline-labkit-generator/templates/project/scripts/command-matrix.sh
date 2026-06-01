@@ -7,7 +7,7 @@ trap cleanup EXIT
 {
   echo "# Command Matrix"
   echo
-  for cmd in "--version" "init --home $HOME_DIR" "doctor --home $HOME_DIR" "status --home $HOME_DIR" "act validate" "act validate --file examples/acts/minimal.act.json" "act emit --file examples/acts/minimal.act.json" "candidate add --home $HOME_DIR --file examples/acts/minimal.act.json" "candidate list --home $HOME_DIR"; do
+  for cmd in "--version" "init --home $HOME_DIR" "doctor --home $HOME_DIR" "status --home $HOME_DIR" "act validate" "act validate --file examples/acts/minimal.act.json" "act emit --file examples/acts/minimal.act.json" "candidate add --home $HOME_DIR --file examples/acts/minimal.act.json" "candidate list --home $HOME_DIR" "ghost list --home $HOME_DIR" "report generate daily-state --home $HOME_DIR" "status --home $HOME_DIR"; do
     echo "## logline-lab $cmd"
     $BIN $cmd
     echo
