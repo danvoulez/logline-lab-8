@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://logline.local/schemas/candidate-metadata.schema.json",
+  "title": "Candidate Metadata",
+  "description": "Local operational metadata for .logline-lab/candidates/<candidate_id>/metadata.json. This is not official spine admission, not evidence, and not a receipt.",
+  "type": "object",
+  "required": [
+    "candidate_id",
+    "captured_at",
+    "source_file",
+    "status",
+    "authority",
+    "validated_act_shape",
+    "input_hash"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "candidate_id": {
+      "type": "string",
+      "pattern": "^cand_[A-Za-z0-9_-]+$"
+    },
+    "captured_at": {
+      "type": "string"
+    },
+    "source_file": {
+      "type": "string"
+    },
+    "status": {
+      "const": "candidate"
+    },
+    "authority": {
+      "const": "local_capture_only_not_official_spine"
+    },
+    "validated_act_shape": {
+      "type": "boolean"
+    },
+    "input_hash": {
+      "type": "string"
+    }
+  }
+}

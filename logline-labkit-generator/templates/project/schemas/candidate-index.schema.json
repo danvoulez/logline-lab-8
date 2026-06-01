@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://logline.local/schemas/candidate-index.schema.json",
+  "title": "Candidate Index",
+  "description": "Local operational queue index for .logline-lab/candidates/index.json. It is not truth, not a ledger, not official spine, and not a receipt.",
+  "type": "object",
+  "required": [
+    "index_version",
+    "authority",
+    "updated_at",
+    "candidates"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "index_version": {
+      "const": 1
+    },
+    "authority": {
+      "const": "local_candidate_queue_index_not_official_spine"
+    },
+    "updated_at": {
+      "type": "string"
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "candidate_id",
+          "path",
+          "metadata_path",
+          "captured_at",
+          "status"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "candidate_id": {
+            "type": "string",
+            "pattern": "^cand_[A-Za-z0-9_-]+$"
+          },
+          "path": {
+            "type": "string",
+            "pattern": "^cand_[A-Za-z0-9_-]+/candidate\\.json$"
+          },
+          "metadata_path": {
+            "type": "string",
+            "pattern": "^cand_[A-Za-z0-9_-]+/metadata\\.json$"
+          },
+          "captured_at": {
+            "type": "string"
+          },
+          "status": {
+            "const": "candidate"
+          }
+        }
+      }
+    }
+  }
+}

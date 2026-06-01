@@ -1,10 +1,70 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://logline.local/schemas/lab-manifest.schema.json",
   "title": "Lab Manifest",
+  "description": "Local Lab home manifest. Selected pack/profile record local practice and capability choices only; they do not amend canon or create official admission.",
   "type": "object",
   "required": [
+    "manifest_version",
     "lab",
-    "pack",
-    "profile"
-  ]
+    "selected",
+    "loads",
+    "authority",
+    "rules"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "manifest_version": {
+      "const": 1
+    },
+    "lab": {
+      "type": "object",
+      "required": ["id", "name", "kind"],
+      "additionalProperties": true,
+      "properties": {
+        "id": {"type": "string"},
+        "name": {"type": "string"},
+        "kind": {"type": "string"}
+      }
+    },
+    "selected": {
+      "type": "object",
+      "required": ["pack", "profile"],
+      "additionalProperties": false,
+      "properties": {
+        "pack": {"type": "string"},
+        "profile": {"type": "string"}
+      }
+    },
+    "loads": {
+      "type": "object",
+      "additionalProperties": {"type": "string"},
+      "properties": {
+        "canon": {"type": "string"},
+        "pack": {"type": "string"},
+        "profile": {"type": "string"}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "required": ["canon_amendment", "local_workspace_only", "receipt_closure"],
+      "additionalProperties": true,
+      "properties": {
+        "summary": {"type": "string"},
+        "canon_amendment": {"const": false},
+        "local_workspace_only": {"type": "boolean"},
+        "receipt_closure": {"const": false}
+      }
+    },
+    "rules": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "act_shape": {"const": "nine-slot"},
+        "local_home_is_authority": {"const": false},
+        "projections_are_read_models": {"type": "boolean"},
+        "llm_is_authority": {"const": false}
+      }
+    }
+  }
 }

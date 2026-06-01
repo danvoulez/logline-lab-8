@@ -112,3 +112,79 @@ fn top_level_exactly_nine_slots_passes() {
     let keys = act.slots().keys().map(String::as_str).collect::<Vec<_>>();
     assert_eq!(keys.len(), 9);
 }
+
+fn project_root() -> std::path::PathBuf {
+    std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .ancestors()
+        .nth(2)
+        .expect("project root")
+        .to_path_buf()
+}
+
+#[test]
+fn generated_act_schema_documents_exact_nine_slots() {
+    let schema_path = project_root().join("schemas/logline-act.schema.json");
+    let schema = std::fs::read_to_string(&schema_path).expect("read logline-act schema");
+    let value: serde_json::Value = serde_json::from_str(&schema).expect("schema is JSON");
+    let required = value
+        .get("required")
+        .and_then(serde_json::Value::as_array)
+        .expect("required array");
+    let required_slots = required
+        .iter()
+        .map(|slot| slot.as_str().expect("slot string"))
+        .collect::<Vec<_>>();
+    assert_eq!(required_slots, logline_act::ACT_SLOTS.to_vec());
+    assert_eq!(
+        value.get("additionalProperties"),
+        Some(&serde_json::Value::Bool(false))
+    );
+    assert!(!schema.contains("selected_branch"));
+    assert!(!schema.contains("runtime_envelope"));
+}
+
+#[test]
+fn generated_candidate_schemas_and_fixture_index_exist() {
+    let root = project_root();
+    for rel in [
+        "schemas/candidate-metadata.schema.json",
+        "schemas/candidate-index.schema.json",
+        "examples/fixtures.index.md",
+    ] {
+        assert!(root.join(rel).is_file(), "missing {rel}");
+    }
+    let index = std::fs::read_to_string(root.join("examples/fixtures.index.md"))
+        .expect("read fixture index");
+    for fixture in [
+        "examples/acts/minimal.act.json",
+        "examples/candidates/ugly-candidate.json",
+        "examples/invalid/extra-selected-branch.json",
+        "examples/invalid/extra-runtime-envelope.json",
+        "examples/candidates/candidate-metadata.json",
+        "examples/candidates/candidate-index.json",
+    ] {
+        assert!(index.contains(fixture), "fixture index missing {fixture}");
+    }
+}
+
+#[test]
+fn fixture_files_match_rust_validator_expectations() {
+    let root = project_root();
+    for rel in [
+        "examples/acts/minimal.act.json",
+        "examples/candidates/ugly-candidate.json",
+    ] {
+        let text = std::fs::read_to_string(root.join(rel)).expect("read valid fixture");
+        parse_act_json(&text).unwrap_or_else(|err| panic!("{rel} should validate: {err}"));
+    }
+    for rel in [
+        "examples/invalid/missing-confirmed-by.json",
+        "examples/invalid/extra-selected-branch.json",
+        "examples/invalid/extra-runtime-envelope.json",
+        "examples/invalid/extra-top-level-field.json",
+        "examples/invalid/malformed.json",
+    ] {
+        let text = std::fs::read_to_string(root.join(rel)).expect("read invalid fixture");
+        assert!(parse_act_json(&text).is_err(), "{rel} should be rejected");
+    }
+}

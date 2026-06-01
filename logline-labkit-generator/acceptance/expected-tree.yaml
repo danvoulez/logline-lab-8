@@ -33,3 +33,10 @@ required_paths:
   - crates/logline-lab-cli/tests/reports.rs
   - crates/logline-lab-cli/tests/packs_profiles.rs
   - crates/logline-lab-cli/tests/help_version.rs
+  - docs/09-schemas-and-fixtures.md
+  - schemas/candidate-metadata.schema.json
+  - schemas/candidate-index.schema.json
+  - examples/fixtures.index.md
+  - examples/candidates/candidate-metadata.json
+  - examples/candidates/candidate-index.json
+  - examples/invalid/candidate-index-inconsistent.json

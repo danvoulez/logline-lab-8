@@ -11,8 +11,14 @@ pub const LOCAL_DIRS: &[&str] = &["candidates", "reports", "ghosts", "profiles",
 pub const PROJECT_REQUIRED_PATHS: &[&str] = &[
     "schemas/logline-act.schema.json",
     "schemas/lab-manifest.schema.json",
+    "schemas/candidate-metadata.schema.json",
+    "schemas/candidate-index.schema.json",
+    "schemas/pack-manifest.schema.json",
+    "schemas/profile.schema.json",
     "examples/acts/minimal.act.json",
+    "examples/fixtures.index.md",
     "docs/01-logline-act.md",
+    "docs/09-schemas-and-fixtures.md",
 ];
 pub const INITIAL_GHOSTS: &[&str] = &[
     "remote-spine-unconfigured",

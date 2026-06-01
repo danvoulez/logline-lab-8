@@ -1,9 +1,57 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Profile",
+  "$id": "https://logline.local/schemas/profile.schema.json",
+  "title": "Profile Manifest",
+  "description": "Blueprint-rendered profile manifest. Supabase fields are profile-specific declarations, not universal canon and not an implemented ingest path.",
   "type": "object",
   "required": [
+    "profile_version",
     "profile",
-    "capabilities"
-  ]
+    "authority",
+    "capabilities",
+    "default_ghosts"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "source_kind": {"type": "string"},
+    "profile_version": {"const": 1},
+    "profile": {
+      "type": "object",
+      "required": ["id", "name", "kind"],
+      "additionalProperties": true,
+      "properties": {
+        "id": {"enum": ["local-offline", "supabase"]},
+        "name": {"type": "string"},
+        "kind": {"type": "string"}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": {"type": ["boolean", "string"]},
+      "properties": {
+        "official_spine": {"const": false},
+        "local_workspace_only": {"type": "boolean"},
+        "receipt_closure": {"const": false},
+        "official_spine_declared": {"type": "boolean"},
+        "universal_canon": {"const": false},
+        "requires_configuration": {"type": "boolean"}
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": {"type": ["boolean", "string"]}
+    },
+    "required_env": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "unavailable_capabilities": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "default_ghosts": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  }
 }
