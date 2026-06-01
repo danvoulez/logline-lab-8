@@ -1,4 +1,4 @@
-use std::{env, fs, process};
+use std::{env, fs, path::PathBuf, process};
 
 fn main() {
     let args = env::args().skip(1).collect::<Vec<_>>();
@@ -21,18 +21,50 @@ fn dispatch(args: &[String]) -> i32 {
             print_help();
             0
         }
-        [cmd] if cmd == "init" => {
-            println!("partial: lab manifest template is available in manifests/lab.manifest.example.yaml");
-            0
-        }
-        [cmd] if cmd == "doctor" => {
-            println!("{}", logline_lab_core::doctor_report());
-            0
-        }
-        [cmd] if cmd == "status" => {
-            println!("{}", logline_lab_core::status_report());
-            0
-        }
+        [cmd, rest @ ..] if cmd == "init" => match home_from_args(rest) {
+            Ok(home) => match logline_lab_core::init_lab_home(&home) {
+                Ok(report) => {
+                    println!("{}", report.to_text());
+                    0
+                }
+                Err(err) => {
+                    eprintln!("init: failed");
+                    eprintln!("home: {}", home.display());
+                    eprintln!("error: {err}");
+                    1
+                }
+            },
+            Err(message) => {
+                eprintln!("{message}");
+                1
+            }
+        },
+        [cmd, rest @ ..] if cmd == "doctor" => match home_from_args(rest) {
+            Ok(home) => {
+                let report = logline_lab_core::doctor_report_for(&home);
+                if report.is_ok() {
+                    println!("{}", report.to_text());
+                    0
+                } else {
+                    eprintln!("{}", report.to_text());
+                    1
+                }
+            }
+            Err(message) => {
+                eprintln!("{message}");
+                1
+            }
+        },
+        [cmd, rest @ ..] if cmd == "status" => match home_from_args(rest) {
+            Ok(home) => {
+                println!("{}", logline_lab_core::status_report_for(&home).to_text());
+                0
+            }
+            Err(message) => {
+                eprintln!("{message}");
+                1
+            }
+        },
         [cmd] if cmd == "lab" => {
             eprintln!("Ghost: interactive-lab-surface-unimplemented");
             2
@@ -91,7 +123,17 @@ fn dispatch(args: &[String]) -> i32 {
     }
 }
 
+fn home_from_args(args: &[String]) -> Result<PathBuf, String> {
+    match args {
+        [] => Ok(PathBuf::from(".")),
+        [flag, path] if flag == "--home" => Ok(PathBuf::from(path)),
+        [flag] if flag == "--home" => Err("missing value for --home".to_string()),
+        [path] => Ok(PathBuf::from(path)),
+        _ => Err("usage: logline-lab <init|doctor|status> [--home <path>]".to_string()),
+    }
+}
+
 fn print_help() {
     println!("Usage: logline-lab <command>");
-    println!("Commands: init, doctor, status, act validate [--file <path>], act emit --file <path>, lab, chat");
+    println!("Commands: init [--home <path>], doctor [--home <path>], status [--home <path>], act validate [--file <path>], act emit --file <path>, lab, chat");
 }
