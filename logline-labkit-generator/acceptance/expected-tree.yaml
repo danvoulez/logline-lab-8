@@ -6,4 +6,9 @@ required_paths:
   - crates/logline-lab-core
   - crates/logline-lab-cli
   - docs/00-overview.md
+  - .github/pull_request_template.md
+  - docs/contributing/PR_PRACTICES.md
+  - docs/contributing/NO_DRIFT_REVIEW.md
+  - docs/contributing/GENERATOR_WORKFLOW.md
+  - docs/contributing/AUTHORITY_BOUNDARIES.md
   - reports/GHOSTS.md

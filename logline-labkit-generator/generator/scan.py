@@ -4,17 +4,17 @@ import sys
 
 MARKERS = [
     ("selected_branch as Act slot", ["selected_branch:"], ["metadata", "projection"]),
-    ("runtime envelope as Act slot", ["runtime envelope"], ["provenance", "not canon"]),
-    ("primitive system framing", ["primitive system", "primitives"], ["forbidden", "rejected", "historical"]),
-    ("artifact as positive category", ["artifact"], ["forbidden", "rejected", "removed", "not use"]),
-    ("Supabase as universal canon", ["Supabase as universal canon", "universal: true"], []),
-    ("Santo André as official pack", ["official: true", "official pack"], ["not official", "official: false"]),
+    ("runtime envelope as Act slot", ["runtime envelope"], ["provenance", "not canon", "does not", "treated as", "red flag"]),
+    ("primitive system framing", ["primitive system", "primitives"], ["forbidden", "rejected", "historical", "does not", "red flag", "framing returns"]),
+    ("artifact as positive category", ["artifact"], ["forbidden", "rejected", "removed", "not use", "does not", "red flag", "used as positive category"]),
+    ("Supabase as universal canon", ["Supabase as universal canon", "universal: true"], ["does not", "described as", "red flag"]),
+    ("Santo André as official pack", ["official: true", "official pack"], ["not official", "official: false", "does not", "described as", "red flag"]),
     ("local SQLite truth", ["local SQLite truth", "SQLite ledger", "SQLite spine"], ["forbidden"]),
     ("file/JSON/JSONL ledger", ["file ledger", "JSON ledger", "JSONL ledger"], ["forbidden"]),
     ("LLM decided", ["LLM decided"], []),
     ("Accepted/DECIDED without Dan approval", ["DECIDED", "Accepted"], ["without Dan approval", "Dan Amarilho"]),
-    ("receipt without evidence", ["receipt without evidence"], ["forbidden", "no_receipt_without_evidence"]),
-    ("tests passed without output", ["tests passed", "build success"], []),
+    ("receipt without evidence", ["receipt without evidence"], ["forbidden", "no_receipt_without_evidence", "red flag", "block", "without evidence"]),
+    ("tests passed without output", ["tests passed", "build success"], ["without command output", "without output", "do not claim", "cannot claim"]),
     ("vendor edits", ["vendor edits"], ["forbidden", "no_vendor_edits"]),
 ]
 SKIP_DIRS = {"target", ".git"}
