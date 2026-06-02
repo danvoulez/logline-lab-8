@@ -82,8 +82,8 @@ Confirm the generated project does not introduce:
 Keep remaining Ghosts listed unless they are actually implemented:
 
 - remote-spine-unconfigured
-- supabase-ingest-unimplemented
-- supabase-env-unverified
+- supabase-ingest-unconfigured
+- supabase-env-unconfigured
 - evidence-registry-unimplemented
 - receipt-closure-unimplemented
 - interactive-lab-surface-unimplemented

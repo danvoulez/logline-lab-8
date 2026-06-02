@@ -45,7 +45,7 @@ def tracked_zip_files():
 
 REQUIRED = [
     "README.md", "VERSION", "LICENSE", "Cargo.toml", "Cargo.lock", "rust-toolchain.toml", "install.sh", ".env.example",
-    "crates/logline-act/Cargo.toml", "crates/logline-lab-core/Cargo.toml", "crates/logline-lab-core/src/lab_home.rs", "crates/logline-lab-core/src/candidates.rs", "crates/logline-lab-core/src/catalog.rs", "crates/logline-lab-core/src/ghosts.rs", "crates/logline-lab-core/src/projections.rs", "crates/logline-lab-core/src/reports.rs", "crates/logline-lab-cli/Cargo.toml",
+    "crates/logline-act/Cargo.toml", "crates/logline-lab-core/Cargo.toml", "crates/logline-lab-core/src/lab_home.rs", "crates/logline-lab-core/src/candidates.rs", "crates/logline-lab-core/src/catalog.rs", "crates/logline-lab-core/src/ghosts.rs", "crates/logline-lab-core/src/projections.rs", "crates/logline-lab-core/src/reports.rs", "crates/logline-lab-core/src/supabase.rs", "crates/logline-lab-cli/Cargo.toml",
     "docs/00-overview.md", "docs/01-logline-act.md", "docs/02-product.md", "docs/03-packs-and-profiles.md",
     "docs/04-cli.md", "docs/05-install.md", "docs/06-recovery.md", "docs/07-interactive-ux.md", "docs/08-llm-boundary.md", "docs/09-schemas-and-fixtures.md", "docs/10-projections.md", "docs/release/RELEASE_CHECKLIST.md",
     ".github/pull_request_template.md", "docs/contributing/PR_PRACTICES.md", "docs/contributing/NO_DRIFT_REVIEW.md",
@@ -57,7 +57,8 @@ REQUIRED = [
     "examples/acts/minimal.act.json", "examples/candidates/ugly-candidate.json", "examples/candidates/candidate-metadata.json", "examples/candidates/candidate-index.json", "examples/fixtures.index.md",
     "examples/invalid/missing-confirmed-by.json", "examples/invalid/extra-selected-branch.json", "examples/invalid/extra-runtime-envelope.json",
     "examples/invalid/malformed.json", "examples/invalid/extra-top-level-field.json", "examples/invalid/candidate-index-inconsistent.json",
-    "crates/logline-act/tests/act_validation.rs", "crates/logline-lab-cli/tests/cli_act.rs", "crates/logline-lab-cli/tests/lab_home.rs", "crates/logline-lab-cli/tests/candidates.rs", "crates/logline-lab-cli/tests/candidate_index.rs", "crates/logline-lab-cli/tests/reports.rs", "crates/logline-lab-cli/tests/projections.rs", "crates/logline-lab-cli/tests/packs_profiles.rs", "crates/logline-lab-cli/tests/help_version.rs", "scripts/smoke-local.sh", "scripts/scan-forbidden-markers.sh", "scripts/command-matrix.sh",
+    "crates/logline-act/tests/act_validation.rs", "crates/logline-lab-cli/tests/cli_act.rs", "crates/logline-lab-cli/tests/lab_home.rs", "crates/logline-lab-cli/tests/candidates.rs", "crates/logline-lab-cli/tests/candidate_index.rs", "crates/logline-lab-cli/tests/reports.rs", "crates/logline-lab-cli/tests/projections.rs", "crates/logline-lab-cli/tests/packs_profiles.rs", "crates/logline-lab-cli/tests/help_version.rs", "crates/logline-lab-cli/tests/setup.rs", "scripts/smoke-local.sh", "scripts/scan-forbidden-markers.sh", "scripts/command-matrix.sh",
+    "supabase/migrations/0001_ops_logline_acts.sql",
     "reports/GHOSTS.md", "reports/COMMAND_MATRIX.md", "reports/FORBIDDEN_MARKER_SCAN.md",
 ]
 

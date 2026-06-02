@@ -21,7 +21,7 @@ This generated kit has a small built-in catalog that mirrors the YAML manifests 
 ### Profiles
 
 - `local-offline`: safe local workspace profile. It declares local home, Act validation, Candidate capture, Ghost listing, and Daily State report as available. Remote spine, evidence registry, receipt closure, LLM translator, and interactive lab surface remain unavailable/Ghost.
-- `supabase`: online spine profile declaration. It declares Supabase-related capability names but does not run Supabase ingest, migrations, environment verification, receipt closure, or evidence registry in this PR state. Missing Supabase environment is reported as Ghost/unverified, not as universal canon failure.
+- `supabase`: online spine profile. It provides migration material for `ops.logline_acts`, checks configured Supabase access, and can emit Acts through `ops.ingest_logline_act` when the project is configured. Missing Supabase environment or unapplied migrations are reported as configuration Ghosts, not as universal canon failure.
 
 ## Init selection
 

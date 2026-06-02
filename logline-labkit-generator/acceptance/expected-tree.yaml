@@ -12,6 +12,8 @@ required_paths:
   - crates/logline-lab-core/src/ghosts.rs
   - crates/logline-lab-core/src/projections.rs
   - crates/logline-lab-core/src/reports.rs
+  - crates/logline-lab-core/src/supabase.rs
+  - supabase/migrations/0001_ops_logline_acts.sql
   - docs/00-overview.md
   - docs/release/RELEASE_CHECKLIST.md
   - .github/pull_request_template.md
@@ -35,6 +37,7 @@ required_paths:
   - crates/logline-lab-cli/tests/projections.rs
   - crates/logline-lab-cli/tests/packs_profiles.rs
   - crates/logline-lab-cli/tests/help_version.rs
+  - crates/logline-lab-cli/tests/setup.rs
   - docs/09-schemas-and-fixtures.md
   - docs/10-projections.md
   - schemas/candidate-metadata.schema.json

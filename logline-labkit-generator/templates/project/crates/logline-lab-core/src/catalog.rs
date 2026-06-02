@@ -58,8 +58,8 @@ const LOCAL_OFFLINE_GHOSTS: &[&str] = &[
 ];
 
 const SUPABASE_GHOSTS: &[&str] = &[
-    "supabase-ingest-unimplemented",
-    "supabase-env-unverified",
+    "supabase-ingest-unconfigured",
+    "supabase-env-unconfigured",
     "remote-spine-unconfigured",
     "evidence-registry-unimplemented",
     "receipt-closure-unimplemented",
@@ -111,7 +111,7 @@ const LOCAL_OFFLINE_CAPABILITIES: &[ProfileCapability] = &[
 const SUPABASE_CAPABILITIES: &[ProfileCapability] = &[
     ProfileCapability {
         key: "remote_spine",
-        state: "declared_not_implemented/unconfigured",
+        state: "implemented_when_configured",
     },
     ProfileCapability {
         key: "act_validation",
@@ -127,7 +127,11 @@ const SUPABASE_CAPABILITIES: &[ProfileCapability] = &[
     },
     ProfileCapability {
         key: "supabase_ingest",
-        state: "unimplemented/ghost",
+        state: "implemented_when_configured",
+    },
+    ProfileCapability {
+        key: "supabase_env_verification",
+        state: "available",
     },
     ProfileCapability {
         key: "evidence_registry",

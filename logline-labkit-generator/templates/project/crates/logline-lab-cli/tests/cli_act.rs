@@ -64,3 +64,50 @@ fn emit_file_rejects_invalid_json_act_before_preview() {
 
     let _ = fs::remove_file(path);
 }
+
+#[test]
+fn remote_emit_requires_supabase_env_without_writing_locally() {
+    let path = write_temp_act(
+        "remote-missing-env",
+        r#"{"who":"dan","did":"record_decision","this":{},"when":"2026-06-01T00:00:00Z","confirmed_by":{},"if_ok":{},"if_doubt":{},"if_not":{},"status":"candidate"}"#,
+    );
+
+    let output = Command::new(env!("CARGO_BIN_EXE_logline-lab"))
+        .args(["act", "emit", "--file"])
+        .arg(&path)
+        .arg("--remote")
+        .env_remove("SUPABASE_URL")
+        .env_remove("SUPABASE_SERVICE_ROLE_KEY")
+        .output()
+        .expect("run cli");
+
+    assert!(
+        !output.status.success(),
+        "stdout: {}",
+        String::from_utf8_lossy(&output.stdout)
+    );
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains("missing required env"));
+    assert!(stderr.contains("SUPABASE_URL"));
+    assert!(stderr.contains("SUPABASE_SERVICE_ROLE_KEY"));
+    assert!(stderr.contains("remote-spine-unconfigured"));
+
+    let _ = fs::remove_file(path);
+}
+
+#[test]
+fn supabase_check_requires_env_without_printing_secret_values() {
+    let output = Command::new(env!("CARGO_BIN_EXE_logline-lab"))
+        .args(["supabase", "check"])
+        .env_remove("SUPABASE_URL")
+        .env_remove("SUPABASE_SERVICE_ROLE_KEY")
+        .output()
+        .expect("run cli");
+
+    assert!(!output.status.success());
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains("missing required env"));
+    assert!(stderr.contains("SUPABASE_URL"));
+    assert!(stderr.contains("SUPABASE_SERVICE_ROLE_KEY"));
+    assert!(!stderr.contains("service_role="));
+}

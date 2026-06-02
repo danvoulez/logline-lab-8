@@ -85,11 +85,15 @@ Installed: $TARGET_BIN
 Next steps:
   export PATH="$BIN_DIR:\$PATH"
   logline-lab --version
-  logline-lab --help
-  logline-lab init --home ./demo-lab --pack santo-andre --profile local-offline
-  logline-lab doctor --home ./demo-lab
+  logline-lab serve
+  # then open http://127.0.0.1:8787
 
 Authority boundary:
   local-offline uses local workspace state only; it is not an official spine,
   not a receipt store, and does not require Supabase or external services.
+
+Supabase profile:
+  apply supabase/migrations/0001_ops_logline_acts.sql with your reviewed
+  Supabase migration flow, then set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.
+  Use: logline-lab supabase check
 NEXT

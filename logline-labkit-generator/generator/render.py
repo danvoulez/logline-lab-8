@@ -15,8 +15,8 @@ PROFILE_BLUEPRINTS = {
 }
 REQUIRED_GHOSTS = [
     "remote-spine-unconfigured",
-    "supabase-ingest-unimplemented",
-    "supabase-env-unverified",
+    "supabase-ingest-unconfigured",
+    "supabase-env-unconfigured",
     "evidence-registry-unimplemented",
     "receipt-closure-unimplemented",
     "interactive-lab-surface-unimplemented",
@@ -168,7 +168,8 @@ def render_ghost_report():
             "",
             "- Implemented: pack/profile manifests exist for `santo-andre`, `personal-offline`, `local-offline`, and `supabase`.",
             "- Implemented: init validates selected pack/profile ids and materializes them in `.logline-lab/lab.manifest.yaml`.",
-            "- Ghost: Supabase profile capabilities are declarations only; no Supabase ingest or environment verification runs in this project state.",
+            "- Implemented when configured: Supabase profile check and Act ingest use the configured Supabase REST/RPC boundary.",
+            "- Ghost: Supabase remains unconfigured until env vars and migrations expose `ops.logline_acts`.",
             "- Ghost: Personal Offline passkey checkpointing, batch signing, adapters, and selective disclosure are declared only.",
         ]
     )

@@ -12,12 +12,12 @@
     "requires_configuration": true
   },
   "capabilities": {
-    "remote_spine": "declared_not_implemented",
+    "remote_spine": "implemented_when_configured",
     "act_validation": true,
     "candidate_capture": true,
     "local_lab_home": true,
-    "supabase_ingest": "unimplemented",
-    "supabase_env_verification": "unverified",
+    "supabase_ingest": "implemented_when_configured",
+    "supabase_env_verification": true,
     "evidence_registry": "unimplemented",
     "receipt_closure": "unimplemented"
   },
@@ -27,15 +27,12 @@
     "SUPABASE_SERVICE_ROLE_KEY"
   ],
   "unavailable_capabilities": [
-    "remote_spine",
-    "supabase_ingest",
-    "supabase_env_verification",
     "evidence_registry",
     "receipt_closure"
   ],
   "default_ghosts": [
-    "supabase-ingest-unimplemented",
-    "supabase-env-unverified",
+    "supabase-ingest-unconfigured",
+    "supabase-env-unconfigured",
     "remote-spine-unconfigured"
   ]
 }

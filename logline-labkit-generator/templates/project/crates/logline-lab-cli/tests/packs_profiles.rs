@@ -142,9 +142,9 @@ fn supabase_profile_initializes_but_reports_unconfigured_ghosts() {
     );
     let stdout = String::from_utf8_lossy(&doctor.stdout);
     assert!(stdout.contains("profile: supabase known"));
-    assert!(stdout.contains("remote spine: declared_not_implemented/unconfigured"));
-    assert!(stdout.contains("supabase-ingest-unimplemented"));
-    assert!(stdout.contains("supabase-env-unverified"));
+    assert!(stdout.contains("remote spine: implemented_when_configured"));
+    assert!(stdout.contains("supabase-ingest-unconfigured"));
+    assert!(stdout.contains("supabase-env-unconfigured"));
     let _ = fs::remove_dir_all(home);
 }
 

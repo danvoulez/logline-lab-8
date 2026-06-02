@@ -1,4 +1,5 @@
 use serde_json::{Map, Value};
+use sha2::{Digest, Sha256};
 use std::{error::Error, fmt};
 
 pub const ACT_SLOTS: [&str; 9] = [
@@ -133,6 +134,27 @@ pub fn parse_act_json(input: &str) -> Result<LogLineAct, ActValidationError> {
     }
 }
 
+pub fn canonicalize_act_json(input: &str) -> Result<String, ActValidationError> {
+    let act = parse_act_json(input)?;
+    let mut canonical = Map::new();
+    for slot in ACT_SLOTS {
+        let value = act
+            .slots()
+            .get(slot)
+            .expect("validated Act has every canonical slot")
+            .clone();
+        canonical.insert(slot.to_string(), value);
+    }
+    serde_json::to_string(&Value::Object(canonical))
+        .map_err(|err| ActValidationError::ParseError(err.to_string()))
+}
+
+pub fn act_sha256(input: &str) -> Result<String, ActValidationError> {
+    let canonical = canonicalize_act_json(input)?;
+    let digest = Sha256::digest(canonical.as_bytes());
+    Ok(format!("{digest:x}"))
+}
+
 pub fn validate_act_text(input: &str) -> ValidationReport {
     match parse_act_json(input) {
         Ok(act) => ValidationReport {
@@ -199,5 +221,13 @@ mod tests {
         let act = parse_act_json(input).expect("valid act");
         assert_eq!(act.slot_count(), 9);
         assert_eq!(act.status(), Some("candidate"));
+    }
+
+    #[test]
+    fn canonical_hash_is_stable_for_key_order() {
+        let a = r#"{"who":"dan","did":"tested","this":"act","when":"now","confirmed_by":"stdout","if_ok":"continue","if_doubt":"review","if_not":"reject","status":"candidate"}"#;
+        let b = r#"{"status":"candidate","if_not":"reject","if_doubt":"review","if_ok":"continue","confirmed_by":"stdout","when":"now","this":"act","did":"tested","who":"dan"}"#;
+        assert_eq!(canonicalize_act_json(a).unwrap(), canonicalize_act_json(b).unwrap());
+        assert_eq!(act_sha256(a).unwrap(), act_sha256(b).unwrap());
     }
 }

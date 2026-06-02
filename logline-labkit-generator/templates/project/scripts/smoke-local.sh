@@ -3,8 +3,9 @@ set -eu
 
 ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 HOME_DIR="$(mktemp -d)"
+SETUP_HOME="$(mktemp -d)"
 OUT_DIR="$(mktemp -d)"
-cleanup() { rm -rf "$HOME_DIR" "$OUT_DIR"; }
+cleanup() { rm -rf "$HOME_DIR" "$SETUP_HOME" "$OUT_DIR"; }
 trap cleanup EXIT
 
 cd "$ROOT"
@@ -36,9 +37,28 @@ assert_contains "$OUT_DIR/version.out" "0.1.0-alpha.0"
 
 run_capture help --help
 assert_contains "$OUT_DIR/help.out" "CLI-first local LogLine Lab Kit"
+assert_contains "$OUT_DIR/help.out" "setup"
+assert_contains "$OUT_DIR/help.out" "serve"
 assert_contains "$OUT_DIR/help.out" "candidate add"
 assert_contains "$OUT_DIR/help.out" "report generate daily-state"
 assert_contains "$OUT_DIR/help.out" "projection generate local-summary"
+
+run_capture setup setup --yes --home "$SETUP_HOME" --pack santo-andre --profile local-offline
+assert_contains "$OUT_DIR/setup.out" "LogLine Lab is ready."
+assert_contains "$OUT_DIR/setup.out" "candidate captured"
+assert_contains "$OUT_DIR/setup.out" "daily-state report generated"
+assert_contains "$OUT_DIR/setup.out" "local-summary projection generated"
+assert_contains "$OUT_DIR/setup.out" "Open your Lab:"
+assert_contains "$OUT_DIR/setup.out" "not official spine"
+assert_contains "$OUT_DIR/setup.out" "not receipt"
+assert_contains "$OUT_DIR/setup.out" "not evidence"
+test -f "$SETUP_HOME/.logline-lab/lab.manifest.yaml"
+test -f "$SETUP_HOME/.logline-lab/reports/daily-state.md"
+test -f "$SETUP_HOME/.logline-lab/projections/local-summary.md"
+
+run_capture serve_help serve --help
+assert_contains "$OUT_DIR/serve_help.out" "Usage: logline-lab serve"
+assert_contains "$OUT_DIR/serve_help.out" "local browser product"
 
 run_capture init init --home "$HOME_DIR" --pack santo-andre --profile local-offline
 assert_contains "$OUT_DIR/init.out" "initialized local LogLine Lab home"
@@ -50,6 +70,13 @@ assert_contains "$OUT_DIR/doctor.out" "remote spine: ghost remote-spine-unconfig
 
 run_capture validate act validate --file "$ACT"
 assert_contains "$OUT_DIR/validate.out" "valid LogLine Act"
+
+if env -u SUPABASE_URL -u SUPABASE_SERVICE_ROLE_KEY "$BIN" supabase check >"$OUT_DIR/supabase_check.out" 2>"$OUT_DIR/supabase_check.err"; then
+  echo "smoke-local: supabase check unexpectedly succeeded without env" >&2
+  exit 1
+fi
+assert_contains "$OUT_DIR/supabase_check.err" "missing required env"
+assert_contains "$OUT_DIR/supabase_check.err" "remote-spine-unconfigured"
 
 run_capture add candidate add --home "$HOME_DIR" --file "$ACT"
 assert_contains "$OUT_DIR/add.out" "candidate captured"
