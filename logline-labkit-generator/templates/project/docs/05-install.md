@@ -126,13 +126,21 @@ Some Ghosts are expected. The local profile works while Supabase profile configu
 
 ### Supabase profile
 
-The Supabase profile uses versioned SQL under `supabase/migrations/`. Apply those migrations with the Supabase CLI or reviewed project migration flow before using remote emit.
+The Supabase profile uses versioned SQL under `supabase/migrations/`. The baseline follows the Santo Andre reference spine shape as the generic Lab Kit base schema. It is separate from the `santo-andre` practice pack. Apply those migrations with the Supabase CLI or reviewed project migration flow before using remote emit.
 
 Required server-side environment:
 
 ```bash
+export DATABASE_URL=...
+```
+
+`DATABASE_URL` is preferred for the permanent spine because it can call private `ops` functions and database queues directly. REST env is only for compatible RPC wrappers:
+
+```bash
 export SUPABASE_URL=...
 export SUPABASE_SERVICE_ROLE_KEY=...
+# or Doppler Santo Andre:
+export SUPABASE_SECRET_KEY=...
 ```
 
 Then check and emit:
@@ -142,7 +150,7 @@ logline-lab supabase check
 logline-lab act emit --file examples/acts/minimal.act.json --remote
 ```
 
-Remote emit targets `ops.logline_acts` through `ops.ingest_logline_act`. It does not close receipts and does not write projection tables directly.
+Remote emit targets `ops.logline_acts` through `ops.ingest_logline_act(payload jsonb)`. It does not close receipts and does not write projection tables directly.
 
 ### Candidate index warnings
 

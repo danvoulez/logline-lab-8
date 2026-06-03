@@ -37,7 +37,7 @@ Implemented:
 - Local Lab home init, doctor, and status.
 - First-run setup wizard.
 - Local browser product with setup API.
-- Supabase migration for `ops.logline_acts` and `ops.ingest_logline_act`.
+- Supabase baseline for `ops.logline_acts`, `ops.ingest_logline_act(payload jsonb)`, and PGMQ queues.
 - Supabase configuration check.
 - Remote Act emit through the Supabase spine when configured.
 - Local Candidate capture, list, and get.
@@ -72,11 +72,19 @@ Candidate capture is local operational capture. It validates canonical Act shape
 
 ## Supabase spine profile
 
-The Supabase profile ships a reviewed migration at `supabase/migrations/0001_ops_logline_acts.sql`. Apply it with the Supabase CLI or your reviewed project migration flow, then provide server-side env:
+The Supabase profile ships the generic Lab Kit base spine at `supabase/migrations/0001_ops_logline_acts.sql`. This baseline follows the Santo Andre reference spine shape, but it is not the `santo-andre` practice pack. Apply it with the Supabase CLI or your reviewed project migration flow, then provide server-side env:
+
+```bash
+export DATABASE_URL=...
+```
+
+`DATABASE_URL` is preferred because it lets the CLI call private `ops` functions and queue-backed database features directly. REST env is supported only for projects that expose compatible RPC wrappers:
 
 ```bash
 export SUPABASE_URL=...
 export SUPABASE_SERVICE_ROLE_KEY=...
+# or Doppler Santo Andre:
+export SUPABASE_SECRET_KEY=...
 ```
 
 Then:
@@ -86,7 +94,7 @@ logline-lab supabase check
 logline-lab act emit --file examples/acts/minimal.act.json --remote
 ```
 
-Remote emit writes only through `ops.ingest_logline_act` into `ops.logline_acts`. It does not write projection tables, close receipts, or prove evidence.
+Remote emit writes only through `ops.ingest_logline_act(payload jsonb)` into `ops.logline_acts`. It does not write projection tables directly, close receipts, or prove evidence.
 
 ## First Daily State report and local summary projection
 

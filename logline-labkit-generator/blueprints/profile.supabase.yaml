@@ -21,10 +21,29 @@
     "evidence_registry": "unimplemented",
     "receipt_closure": "unimplemented"
   },
+  "connection_modes": {
+    "preferred": {
+      "name": "direct-postgres",
+      "required_env": [
+        "DATABASE_URL"
+      ]
+    },
+    "fallback": {
+      "name": "compatible-rest-rpc",
+      "required_env_any": [
+        [
+          "SUPABASE_URL",
+          "SUPABASE_SERVICE_ROLE_KEY"
+        ],
+        [
+          "SUPABASE_URL",
+          "SUPABASE_SECRET_KEY"
+        ]
+      ]
+    }
+  },
   "required_env": [
-    "SUPABASE_URL",
-    "SUPABASE_ANON_KEY",
-    "SUPABASE_SERVICE_ROLE_KEY"
+    "DATABASE_URL"
   ],
   "unavailable_capabilities": [
     "evidence_registry",

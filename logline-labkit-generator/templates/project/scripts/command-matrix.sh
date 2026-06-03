@@ -24,8 +24,8 @@ trap cleanup EXIT
   if $BIN chat; then echo "unexpected implemented"; else echo "ghost expected"; fi
   echo
   echo "## logline-lab supabase check"
-  if env -u SUPABASE_URL -u SUPABASE_SERVICE_ROLE_KEY $BIN supabase check; then echo "unexpected configured"; else echo "configuration ghost expected"; fi
+  if env -u DATABASE_URL -u SUPABASE_URL -u SUPABASE_SERVICE_ROLE_KEY -u SUPABASE_SECRET_KEY $BIN supabase check; then echo "unexpected configured"; else echo "configuration ghost expected"; fi
   echo
   echo "## logline-lab act emit --file examples/acts/minimal.act.json --remote"
-  if env -u SUPABASE_URL -u SUPABASE_SERVICE_ROLE_KEY $BIN act emit --file examples/acts/minimal.act.json --remote; then echo "unexpected remote write"; else echo "configuration ghost expected"; fi
+  if env -u DATABASE_URL -u SUPABASE_URL -u SUPABASE_SERVICE_ROLE_KEY -u SUPABASE_SECRET_KEY $BIN act emit --file examples/acts/minimal.act.json --remote; then echo "unexpected remote write"; else echo "configuration ghost expected"; fi
 } | tee reports/COMMAND_MATRIX_RUN.md

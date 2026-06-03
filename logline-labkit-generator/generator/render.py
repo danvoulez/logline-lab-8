@@ -168,8 +168,8 @@ def render_ghost_report():
             "",
             "- Implemented: pack/profile manifests exist for `santo-andre`, `personal-offline`, `local-offline`, and `supabase`.",
             "- Implemented: init validates selected pack/profile ids and materializes them in `.logline-lab/lab.manifest.yaml`.",
-            "- Implemented when configured: Supabase profile check and Act ingest use the configured Supabase REST/RPC boundary.",
-            "- Ghost: Supabase remains unconfigured until env vars and migrations expose `ops.logline_acts`.",
+            "- Implemented when configured: Supabase profile check and Act ingest prefer `DATABASE_URL` and call the configured `ops` spine directly.",
+            "- Ghost: Supabase remains unconfigured until env vars and the baseline migration expose `ops.logline_acts` and `ops.ingest_logline_act(payload)`.",
             "- Ghost: Personal Offline passkey checkpointing, batch signing, adapters, and selective disclosure are declared only.",
         ]
     )

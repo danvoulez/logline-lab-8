@@ -94,9 +94,9 @@ The Rust validator is authoritative for valid/invalid Act shape in the CLI. The 
 
 `logline-lab act emit --file <path>` validates the Act and returns a preview-only message. It does not write remote state and does not close a receipt.
 
-`logline-lab act emit --file <path> --remote` validates the Act, computes the tuple hash, and calls `ops.ingest_logline_act` through the configured Supabase REST/RPC boundary. The only semantic write target is `ops.logline_acts`. It is not a receipt and not evidence.
+`logline-lab act emit --file <path> --remote` validates the Act, computes the tuple/content hash, and calls `ops.ingest_logline_act(payload jsonb)` through the configured Supabase spine. With `DATABASE_URL`, the CLI talks directly to Postgres so it can use private `ops` functions and queue-backed schema. The only semantic write target is `ops.logline_acts`. It is not a receipt and not evidence.
 
-`logline-lab supabase check` verifies that `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are configured and that `ops.logline_acts` is reachable through the Supabase API. It does not write.
+`logline-lab supabase check` verifies that `DATABASE_URL` is configured, or that `SUPABASE_URL` plus `SUPABASE_SERVICE_ROLE_KEY`/`SUPABASE_SECRET_KEY` can reach compatible RPC wrappers. It does not write.
 
 ## Ghost commands
 

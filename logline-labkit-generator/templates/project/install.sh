@@ -94,6 +94,8 @@ Authority boundary:
 
 Supabase profile:
   apply supabase/migrations/0001_ops_logline_acts.sql with your reviewed
-  Supabase migration flow, then set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.
+  Supabase migration flow, then set DATABASE_URL. REST env is supported only
+  for compatible RPC wrappers: SUPABASE_URL plus SUPABASE_SERVICE_ROLE_KEY or
+  SUPABASE_SECRET_KEY.
   Use: logline-lab supabase check
 NEXT

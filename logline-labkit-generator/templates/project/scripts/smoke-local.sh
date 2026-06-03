@@ -71,7 +71,7 @@ assert_contains "$OUT_DIR/doctor.out" "remote spine: ghost remote-spine-unconfig
 run_capture validate act validate --file "$ACT"
 assert_contains "$OUT_DIR/validate.out" "valid LogLine Act"
 
-if env -u SUPABASE_URL -u SUPABASE_SERVICE_ROLE_KEY "$BIN" supabase check >"$OUT_DIR/supabase_check.out" 2>"$OUT_DIR/supabase_check.err"; then
+if env -u DATABASE_URL -u SUPABASE_URL -u SUPABASE_SERVICE_ROLE_KEY -u SUPABASE_SECRET_KEY "$BIN" supabase check >"$OUT_DIR/supabase_check.out" 2>"$OUT_DIR/supabase_check.err"; then
   echo "smoke-local: supabase check unexpectedly succeeded without env" >&2
   exit 1
 fi

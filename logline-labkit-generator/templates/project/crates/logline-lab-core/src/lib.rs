@@ -114,12 +114,8 @@ pub fn emit_preview_result(input: &str) -> Result<String, String> {
 
 pub fn supabase_check_result() -> Result<String, String> {
     supabase::check_from_env()
-        .map(|report| report.to_text())
-        .map_err(|err| err.to_string())
 }
 
 pub fn emit_remote_result(input: &str) -> Result<String, String> {
     supabase::emit_act_from_env(input)
-        .map(|report| report.to_text())
-        .map_err(|err| err.to_string())
 }

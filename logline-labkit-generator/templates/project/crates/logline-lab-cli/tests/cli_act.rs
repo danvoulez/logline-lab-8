@@ -76,8 +76,10 @@ fn remote_emit_requires_supabase_env_without_writing_locally() {
         .args(["act", "emit", "--file"])
         .arg(&path)
         .arg("--remote")
+        .env_remove("DATABASE_URL")
         .env_remove("SUPABASE_URL")
         .env_remove("SUPABASE_SERVICE_ROLE_KEY")
+        .env_remove("SUPABASE_SECRET_KEY")
         .output()
         .expect("run cli");
 
@@ -88,8 +90,8 @@ fn remote_emit_requires_supabase_env_without_writing_locally() {
     );
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains("missing required env"));
-    assert!(stderr.contains("SUPABASE_URL"));
-    assert!(stderr.contains("SUPABASE_SERVICE_ROLE_KEY"));
+    assert!(stderr.contains("DATABASE_URL or SUPABASE_URL"));
+    assert!(stderr.contains("SUPABASE_SERVICE_ROLE_KEY or SUPABASE_SECRET_KEY"));
     assert!(stderr.contains("remote-spine-unconfigured"));
 
     let _ = fs::remove_file(path);
@@ -99,15 +101,17 @@ fn remote_emit_requires_supabase_env_without_writing_locally() {
 fn supabase_check_requires_env_without_printing_secret_values() {
     let output = Command::new(env!("CARGO_BIN_EXE_logline-lab"))
         .args(["supabase", "check"])
+        .env_remove("DATABASE_URL")
         .env_remove("SUPABASE_URL")
         .env_remove("SUPABASE_SERVICE_ROLE_KEY")
+        .env_remove("SUPABASE_SECRET_KEY")
         .output()
         .expect("run cli");
 
     assert!(!output.status.success());
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains("missing required env"));
-    assert!(stderr.contains("SUPABASE_URL"));
-    assert!(stderr.contains("SUPABASE_SERVICE_ROLE_KEY"));
+    assert!(stderr.contains("DATABASE_URL or SUPABASE_URL"));
+    assert!(stderr.contains("SUPABASE_SERVICE_ROLE_KEY or SUPABASE_SECRET_KEY"));
     assert!(!stderr.contains("service_role="));
 }
