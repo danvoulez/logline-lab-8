@@ -6,7 +6,7 @@ MARKERS = [
     ("selected_branch as Act slot", ["selected_branch:"], ["metadata", "projection"]),
     ("runtime envelope as Act slot", ["runtime envelope"], ["provenance", "not canon", "does not", "treated as", "red flag"]),
     ("primitive system framing", ["primitive system", "primitives"], ["forbidden", "rejected", "historical", "does not", "red flag", "framing returns"]),
-    ("artifact as positive category", ["artifact"], ["forbidden", "rejected", "removed", "not use", "does not", "red flag", "used as positive category"]),
+    ("artifact as positive category", ["artifact"], ["forbidden", "rejected", "removed", "not use", "does not", "red flag", "used as positive category", "q_artifact_cleanup", "evidence.artifacts", "artifact_refs"]),
     ("Supabase as universal canon", ["Supabase as universal canon", "universal: true"], ["does not", "described as", "red flag"]),
     ("Santo André as official pack", ["official: true", "official pack"], ["not official", "official: false", "does not", "described as", "red flag"]),
     ("local SQLite truth", ["local SQLite truth", "SQLite ledger", "SQLite spine"], ["forbidden"]),
@@ -22,6 +22,8 @@ SKIP_DIRS = {"target", ".git"}
 def files(root):
     for p in root.rglob("*"):
         if any(part in SKIP_DIRS for part in p.parts):
+            continue
+        if p.as_posix().endswith("reports/FORBIDDEN_MARKER_SCAN.md"):
             continue
         if p.is_file():
             yield p

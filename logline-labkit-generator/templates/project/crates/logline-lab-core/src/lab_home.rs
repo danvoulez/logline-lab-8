@@ -26,6 +26,7 @@ pub const PROJECT_REQUIRED_PATHS: &[&str] = &[
     "examples/fixtures.index.md",
     "docs/01-logline-act.md",
     "docs/09-schemas-and-fixtures.md",
+    "supabase/migrations/0001_ops_logline_acts.sql",
 ];
 pub const INITIAL_GHOSTS: &[&str] = &[
     "remote-spine-unconfigured",
@@ -574,7 +575,7 @@ fn default_status(
     profile: &crate::catalog::ProfileManifest,
 ) -> String {
     format!(
-        "# Local LogLine Lab Status\n\nStatus: local workspace initialized.\n\nPack: {}.\nProfile: {}.\n\nAuthority: {}.\n\nRemote spine: Ghost remote-spine-unconfigured unless selected profile only declares it unimplemented/unconfigured.\nReceipt closure: Ghost receipt-closure-unimplemented.\n",
+        "# Local LogLine Lab Status\n\nStatus: local workspace initialized.\n\nPack: {}.\nProfile: {}.\n\nAuthority: {}.\n\nRemote spine: Ghost remote-spine-unconfigured unless selected profile is configured and migrations are applied.\nReceipt closure: Ghost receipt-closure-unimplemented.\n",
         selection.pack_id, selection.profile_id, profile.authority_summary
     )
 }

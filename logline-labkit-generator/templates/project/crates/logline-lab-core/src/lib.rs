@@ -4,6 +4,7 @@ pub mod ghosts;
 pub mod lab_home;
 pub mod projections;
 pub mod reports;
+pub mod supabase;
 
 use std::path::Path;
 
@@ -109,4 +110,12 @@ pub fn emit_preview_result(input: &str) -> Result<String, String> {
             validation
         )
     })
+}
+
+pub fn supabase_check_result() -> Result<String, String> {
+    supabase::check_from_env()
+}
+
+pub fn emit_remote_result(input: &str) -> Result<String, String> {
+    supabase::emit_act_from_env(input)
 }

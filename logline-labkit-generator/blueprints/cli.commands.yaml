@@ -16,6 +16,27 @@
       "ghosts_or_notes": "No authority change."
     },
     {
+      "command": "logline-lab setup",
+      "status": "implemented",
+      "scope": "human first-run local Lab setup",
+      "authority_limit": "creates local workspace, starter Candidate, report, and projection only; not official spine, not receipt, not evidence, not remote sync",
+      "ghosts_or_notes": "Interactive wizard; LLM remains non-authority and unconfigured."
+    },
+    {
+      "command": "logline-lab serve",
+      "status": "implemented",
+      "scope": "local browser product",
+      "authority_limit": "serves local UI and API over localhost only; creates/reads local workspace state only",
+      "ghosts_or_notes": "No cloud service required; LLM remains non-authority and unconfigured."
+    },
+    {
+      "command": "logline-lab supabase check",
+      "status": "implemented",
+      "scope": "Supabase spine configuration",
+      "authority_limit": "checks env and ops.logline_acts visibility only; no write",
+      "ghosts_or_notes": "supabase-env-unconfigured; remote-spine-unconfigured if env or migration is missing"
+    },
+    {
       "command": "logline-lab init",
       "status": "implemented",
       "scope": "local Lab home",
@@ -45,10 +66,10 @@
     },
     {
       "command": "logline-lab act emit",
-      "status": "partial / preview-only",
-      "scope": "Act preview",
-      "authority_limit": "validates and previews only; no remote write or receipt closure",
-      "ghosts_or_notes": "remote-spine-unconfigured; receipt-closure-unimplemented"
+      "status": "implemented / remote when configured",
+      "scope": "Act preview or Supabase spine emit",
+      "authority_limit": "without --remote validates and previews only; with --remote writes only through ops.ingest_logline_act into ops.logline_acts; no receipt closure",
+      "ghosts_or_notes": "remote-spine-unconfigured until Supabase env and migrations are configured; receipt-closure-unimplemented"
     },
     {
       "command": "logline-lab candidate add",

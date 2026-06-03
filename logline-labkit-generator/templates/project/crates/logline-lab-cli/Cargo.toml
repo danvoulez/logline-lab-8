@@ -8,4 +8,7 @@ name = "logline-lab"
 path = "src/main.rs"
 
 [dependencies]
+axum = "0.7"
 logline-lab-core = { path = "../logline-lab-core" }
+serde = { version = "1", features = ["derive"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "net"] }

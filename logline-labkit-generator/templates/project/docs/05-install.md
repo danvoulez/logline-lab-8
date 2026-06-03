@@ -10,6 +10,7 @@ The generated LogLine Lab Kit is local-first. The `local-offline` profile does n
 ./install.sh
 export PATH="$HOME/.local/bin:$PATH"
 logline-lab --version
+logline-lab serve
 ```
 
 By default, `install.sh` builds the release CLI and copies `logline-lab` to `$HOME/.local/bin/logline-lab`.
@@ -39,6 +40,30 @@ cargo run -p logline-lab-cli -- --help
 ```
 
 ## Expected first local flow
+
+Use the browser product:
+
+```bash
+logline-lab serve
+```
+
+Then open `http://127.0.0.1:8787`.
+
+For terminal setup:
+
+```bash
+logline-lab setup
+```
+
+For automation or support scripts:
+
+```bash
+logline-lab setup --yes --home ./demo-lab --pack santo-andre --profile local-offline
+```
+
+Setup creates the Lab home, captures a starter Candidate, writes the Daily State report, generates the local-summary projection, and prints next commands. It remains local workspace state only: not an official spine, not a receipt store, not evidence proof, and not remote sync.
+
+The same flow can be run manually:
 
 ```bash
 logline-lab init --home ./demo-lab --pack santo-andre --profile local-offline
@@ -70,7 +95,7 @@ The initialized home includes `.logline-lab/candidates/index.json` as a local Ca
 
 - Require sudo.
 - Install or contact Supabase.
-- Configure a remote spine.
+- Apply remote spine migrations.
 - Close receipts.
 - Install an LLM provider or TUI.
 - Claim production readiness.
@@ -97,7 +122,35 @@ If you used a custom prefix, replace `$HOME/.local` with that prefix.
 
 ### `doctor` reports Ghosts
 
-Some Ghosts are expected. The local profile works while remote spine writes, receipt closure, evidence registry, interactive Lab surface, LLM translator, and YAML Act parsing remain unimplemented.
+Some Ghosts are expected. The local profile works while Supabase profile configuration, receipt closure, evidence registry, interactive Lab surface, LLM translator, and YAML Act parsing remain unresolved.
+
+### Supabase profile
+
+The Supabase profile uses versioned SQL under `supabase/migrations/`. The baseline follows the Santo Andre reference spine shape as the generic Lab Kit base schema. It is separate from the `santo-andre` practice pack. Apply those migrations with the Supabase CLI or reviewed project migration flow before using remote emit.
+
+Required server-side environment:
+
+```bash
+export DATABASE_URL=...
+```
+
+`DATABASE_URL` is preferred for the permanent spine because it can call private `ops` functions and database queues directly. REST env is only for compatible RPC wrappers:
+
+```bash
+export SUPABASE_URL=...
+export SUPABASE_SERVICE_ROLE_KEY=...
+# or Doppler Santo Andre:
+export SUPABASE_SECRET_KEY=...
+```
+
+Then check and emit:
+
+```bash
+logline-lab supabase check
+logline-lab act emit --file examples/acts/minimal.act.json --remote
+```
+
+Remote emit targets `ops.logline_acts` through `ops.ingest_logline_act(payload jsonb)`. It does not close receipts and does not write projection tables directly.
 
 ### Candidate index warnings
 

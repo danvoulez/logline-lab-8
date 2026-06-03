@@ -30,6 +30,8 @@ fn help_mentions_core_commands_and_boundaries() {
     );
     let stdout = String::from_utf8_lossy(&output.stdout);
     for expected in [
+        "setup",
+        "supabase check",
         "init --home",
         "doctor --home",
         "status --home",

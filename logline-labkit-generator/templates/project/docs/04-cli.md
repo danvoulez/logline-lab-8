@@ -14,10 +14,18 @@ logline-lab --help
 A local Lab home is an operational workspace. It is not canon, not an official spine, and not a receipt store.
 
 ```sh
+logline-lab serve
+logline-lab setup
 logline-lab init --home . --pack santo-andre --profile local-offline
 logline-lab doctor --home .
 logline-lab status --home .
 ```
+
+`logline-lab serve [--host <ip>] [--port <port>]` starts the local browser product. Default address is `http://127.0.0.1:8787`. The browser UI provides a first-run Lab wizard and calls local APIs served by the installed binary. It does not require a cloud service and does not create official spine, receipt, evidence proof, remote sync, or LLM authority.
+
+`logline-lab setup [--home <path>] [--pack <id>] [--profile <id>] [--yes]` is the first-run wizard for a human operator. Without `--yes`, it prompts for Lab home, pack, and profile. It creates the local Lab, validates the starter Act, captures one local Candidate, writes the Daily State report, generates the local-summary projection, lists Ghosts, and prints next commands. `--yes` accepts defaults/flags for automated installs and tests.
+
+Setup creates local workspace state only. It is not an official spine, not a receipt store, not evidence proof, not remote sync, and not an LLM authority layer.
 
 `logline-lab init [--home <path>] [--pack <id>] [--profile <id>]` validates the selected pack/profile against the initial local catalog, creates `.logline-lab/` with an editable `lab.manifest.yaml`, `STATUS.md`, `GHOSTS.md`, and local operational directories for candidates, reports, ghosts, profiles, packs, and projections. It also creates an empty `.logline-lab/candidates/index.json` local Candidate index and `.logline-lab/projections/projection-index.json` local projection metadata. Defaults are `--pack santo-andre --profile local-offline`. Init is idempotent and does not overwrite existing manifest/status/ghost files.
 
@@ -85,6 +93,10 @@ logline-lab projection generate local-summary --home .
 The Rust validator is authoritative for valid/invalid Act shape in the CLI. The JSON Schemas in `schemas/` document generated file shapes and interoperability contracts; the CLI does not replace the Rust validator with runtime JSON Schema validation in this release. `examples/fixtures.index.md` lists valid and invalid fixtures with expected results.
 
 `logline-lab act emit --file <path>` validates the Act and returns a preview-only message. It does not write remote state and does not close a receipt.
+
+`logline-lab act emit --file <path> --remote` validates the Act, computes the tuple/content hash, and calls `ops.ingest_logline_act(payload jsonb)` through the configured Supabase spine. With `DATABASE_URL`, the CLI talks directly to Postgres so it can use private `ops` functions and queue-backed schema. The only semantic write target is `ops.logline_acts`. It is not a receipt and not evidence.
+
+`logline-lab supabase check` verifies that `DATABASE_URL` is configured, or that `SUPABASE_URL` plus `SUPABASE_SERVICE_ROLE_KEY`/`SUPABASE_SECRET_KEY` can reach compatible RPC wrappers. It does not write.
 
 ## Ghost commands
 

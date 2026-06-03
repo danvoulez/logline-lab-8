@@ -2,6 +2,10 @@ binary: logline-lab
 commands:
   - logline-lab --version
   - logline-lab --help
+  - logline-lab setup --help
+  - logline-lab setup
+  - logline-lab serve --help
+  - logline-lab supabase check
   - logline-lab init --help
   - logline-lab init
   - logline-lab doctor
@@ -11,6 +15,7 @@ commands:
   - logline-lab candidate get <candidate_id>
   - logline-lab act validate
   - logline-lab act emit --file <path>
+  - logline-lab act emit --file <path> --remote
   - logline-lab ghost list
   - logline-lab projection list
   - logline-lab projection generate local-summary

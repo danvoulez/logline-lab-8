@@ -21,7 +21,7 @@ This generated kit has a small built-in catalog that mirrors the YAML manifests 
 ### Profiles
 
 - `local-offline`: safe local workspace profile. It declares local home, Act validation, Candidate capture, Ghost listing, and Daily State report as available. Remote spine, evidence registry, receipt closure, LLM translator, and interactive lab surface remain unavailable/Ghost.
-- `supabase`: online spine profile declaration. It declares Supabase-related capability names but does not run Supabase ingest, migrations, environment verification, receipt closure, or evidence registry in this PR state. Missing Supabase environment is reported as Ghost/unverified, not as universal canon failure.
+- `supabase`: online spine profile. It provides the generic Lab Kit base Supabase spine for `ops.logline_acts`, `ops.ingest_logline_act(payload jsonb)`, and PGMQ queues. This baseline follows the Santo Andre reference spine shape, but it is not the `santo-andre` practice pack. Missing Supabase environment or unapplied migrations are reported as configuration Ghosts, not as universal canon failure.
 
 ## Init selection
 

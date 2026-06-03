@@ -12,30 +12,46 @@
     "requires_configuration": true
   },
   "capabilities": {
-    "remote_spine": "declared_not_implemented",
+    "remote_spine": "implemented_when_configured",
     "act_validation": true,
     "candidate_capture": true,
     "local_lab_home": true,
-    "supabase_ingest": "unimplemented",
-    "supabase_env_verification": "unverified",
+    "supabase_ingest": "implemented_when_configured",
+    "supabase_env_verification": true,
     "evidence_registry": "unimplemented",
     "receipt_closure": "unimplemented"
   },
+  "connection_modes": {
+    "preferred": {
+      "name": "direct-postgres",
+      "required_env": [
+        "DATABASE_URL"
+      ]
+    },
+    "fallback": {
+      "name": "compatible-rest-rpc",
+      "required_env_any": [
+        [
+          "SUPABASE_URL",
+          "SUPABASE_SERVICE_ROLE_KEY"
+        ],
+        [
+          "SUPABASE_URL",
+          "SUPABASE_SECRET_KEY"
+        ]
+      ]
+    }
+  },
   "required_env": [
-    "SUPABASE_URL",
-    "SUPABASE_ANON_KEY",
-    "SUPABASE_SERVICE_ROLE_KEY"
+    "DATABASE_URL"
   ],
   "unavailable_capabilities": [
-    "remote_spine",
-    "supabase_ingest",
-    "supabase_env_verification",
     "evidence_registry",
     "receipt_closure"
   ],
   "default_ghosts": [
-    "supabase-ingest-unimplemented",
-    "supabase-env-unverified",
+    "supabase-ingest-unconfigured",
+    "supabase-env-unconfigured",
     "remote-spine-unconfigured"
   ]
 }
